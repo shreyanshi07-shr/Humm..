@@ -916,10 +916,12 @@ html,body{overflow:hidden;overscroll-behavior:none}
 .theme-s{font-size:12px;color:var(--muted);margin-top:2px}
 .theme-pill{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 11px;border-radius:999px;background:#fff;font-size:12.5px;font-weight:600;color:var(--accent);flex-shrink:0}
 .theme-pill i{width:8px;height:8px;border-radius:50%;background:var(--accent)}
-.theme-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;margin-top:14px}
-.theme-sw{position:relative;display:flex;justify-content:center;padding:6px 0;min-width:0;border-radius:50%}
+.theme-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.theme-sw{position:relative;display:flex;align-items:center;gap:12px;padding:10px 12px;min-width:0;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 1.5px transparent;transition:box-shadow .2s}
+.theme-sw[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px var(--c)}
+.theme-lbl{font-size:14px;font-weight:600;color:var(--ink)}
 .theme-sw[aria-pressed="true"]{z-index:1}
-.theme-sw .rec{position:relative;width:min(38px,calc(100% - 8px));height:auto;aspect-ratio:1;border-radius:50%;background:repeating-radial-gradient(circle,#FAFAFB 0 1.5px,#E4E6EB 1.5px 2.5px);box-shadow:0 0 0 1px #E3E5EA,0 3px 8px rgba(20,30,60,.08);transition:box-shadow .25s,transform .25s}
+.theme-sw .rec{position:relative;width:40px;height:40px;flex-shrink:0;border-radius:50%;background:repeating-radial-gradient(circle,#FAFAFB 0 1.5px,#E4E6EB 1.5px 2.5px);box-shadow:0 0 0 1px #E3E5EA,0 3px 8px rgba(20,30,60,.08);transition:box-shadow .25s,transform .25s}
 .theme-sw .lbl{position:absolute;left:50%;top:50%;width:46%;height:46%;border-radius:50%;background:var(--c);transform:translate(-50%,-50%);transition:width .25s,height .25s}
 .theme-sw .hole{position:absolute;left:50%;top:50%;width:4px;height:4px;border-radius:50%;background:#fff;transform:translate(-50%,-50%)}
 .theme-sw[aria-pressed="true"] .rec{box-shadow:0 0 0 2px #F6F6F8,0 0 0 4px var(--c),0 6px 14px rgba(20,30,60,.14);transform:scale(1.06);animation:spin 6s linear infinite}
@@ -954,9 +956,78 @@ html,body{overflow:hidden;overscroll-behavior:none}
 .undo-bar button{height:36px;padding:0 14px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;font-size:13.5px;font-weight:700}
 .undo-bar.out{opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
 @keyframes toastUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* ===== launch splash ===== */
+#splash{position:fixed;inset:0;z-index:999;background:var(--accent);display:flex;align-items:center;justify-content:center;transition:opacity .42s ease,transform .42s ease}
+#splash.out{opacity:0;transform:scale(1.04);pointer-events:none}
+.sp-inner{display:flex;flex-direction:column;align-items:center;transform:translateY(-4%)}
+.sp-buds{color:#fff;height:138px;opacity:0;transform:translateY(-70px)}
+.sp-buds .buds{display:block;overflow:visible}
+#splash .buds{color:#fff!important}
+#splash .buds [fill="#fff"]{fill:var(--accent)}
+.sp-logo{margin-top:14px;font-family:'Yellowtail','Pacifico',cursive;font-size:56px;line-height:1;color:#fff;display:flex;align-items:baseline}
+.sp-word{display:inline-block;clip-path:inset(-20% 100% -30% 0)}
+.sp-dot{display:inline-block;opacity:0;transform:translateY(-14px) scale(.4)}
+.sp-tag{margin-top:12px;font-family:'Inter Tight','Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:lowercase;color:rgba(255,255,255,.78);opacity:0;transform:translateY(6px)}
+#splash.go .sp-buds{animation:spDrop .8s cubic-bezier(.3,1.4,.5,1) forwards}
+#splash.go .sp-word{animation:spWrite .75s cubic-bezier(.6,0,.3,1) .45s forwards}
+#splash.go .sp-dot{animation:spPop .45s cubic-bezier(.3,1.6,.5,1) forwards}
+#splash.go .sp-dot:nth-of-type(2){animation-delay:1.15s}
+#splash.go .sp-dot:nth-of-type(3){animation-delay:1.32s}
+#splash.go .sp-tag{animation:spFade .5s ease 1.45s forwards}
+@keyframes spDrop{to{opacity:1;transform:none}}
+@keyframes spWrite{to{clip-path:inset(-20% -5% -30% 0)}}
+@keyframes spPop{to{opacity:1;transform:none}}
+@keyframes spFade{to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){
+  .sp-buds,.sp-word,.sp-dot,.sp-tag{opacity:1!important;transform:none!important;clip-path:none!important;animation:none!important}
+}
 </style>
+<script>
+/* paint the splash in the saved colour before anything shows */
+try { var T = { cobalt: '#2149E8', ink: '#22252E' }[localStorage.getItem('hum_theme')]; if (T) document.documentElement.style.setProperty('--accent', T); } catch (e) {}
+</script>
 </head>
 <body>
+<div id="splash" aria-hidden="true">
+  <div class="sp-inner">
+    <div class="sp-buds"><svg class="buds" width="92" height="138" viewBox="0 0 100 150" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+<g class="sway sway-l">
+  <path d="M38 0c1 14-3 24-4 36s5 22 3 34-6 18-4 30c1 6 2 10 2 14"/>
+  <g transform="rotate(8 35 120)">
+    <rect x="31" y="112" width="8" height="12" rx="2.5" fill="#fff"/>
+    <path d="M33 116v4"/>
+    <path d="M30 124c-3 3-6 7-7 12-1 6 3 10 8 10 6 0 9-5 8-11-1-5-4-8-9-11z" fill="#fff"/>
+    <ellipse cx="31" cy="138" rx="4.6" ry="6.4" transform="rotate(-14 31 138)"/>
+  </g>
+  </g>
+  <g class="sway sway-r">
+  <path d="M60 0c-2 12 3 22 2 34s-6 22-4 34 6 18 3 30c-1 6-2 10-2 15"/>
+  <g transform="rotate(-8 59 121)">
+    <rect x="55" y="113" width="8" height="12" rx="2.5" fill="#fff"/>
+    <path d="M59 117v4"/>
+    <path d="M62 125c3 3 6 7 7 12 1 6-3 10-8 10-6 0-9-5-8-11 1-5 4-8 9-11z" fill="#fff"/>
+    <ellipse cx="62" cy="139" rx="4.6" ry="6.4" transform="rotate(14 62 139)"/>
+  </g>
+  </g>
+</svg></div>
+    <div class="sp-logo"><span class="sp-word">humm</span><span class="sp-dot">.</span><span class="sp-dot">.</span></div>
+    <div class="sp-tag">music for two</div>
+  </div>
+</div>
+<script>
+(function () {
+  var sp = document.getElementById('splash'), done = false;
+  var m0 = document.querySelector('meta[name="theme-color"]'); if (m0) m0.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2149E8');
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function go() { if (sp.classList.contains('go')) return; sp.classList.add('go'); setTimeout(hide, reduce ? 700 : 2100); }
+  function hide() { if (done) return; done = true; sp.classList.add('out'); var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', '#ffffff'); setTimeout(function () { sp.remove(); }, 450); }
+  sp.addEventListener('click', hide);
+  try { document.fonts.load('40px Yellowtail').then(go, go); } catch (e) { go(); }
+  setTimeout(go, 450);   // never wait long for the font
+  setTimeout(hide, 4000);  // hard stop, whatever happens
+})();
+</script>
 <div class="phone" id="app"></div>
 <input type="file" id="mp3Input" accept=".mp3,audio/mpeg,audio/*" multiple hidden>
 <input type="file" id="coverInput" accept="image/*" hidden>
@@ -1273,13 +1344,8 @@ function onboardView() {
 
 /* ----- colour themes (saved on this phone) ----- */
 const THEMES = {
-  cobalt:    { n: 'Cobalt',    a: '#2149E8', ink: '#1E3FC8', mid: '#4A67E0', tint: '#EEF1FF', dim: '#8E9BD0', hue: 0 },
-  rose:      { n: 'Rose',      a: '#D9416F', ink: '#B12F58', mid: '#D35F85', tint: '#FDEEF3', dim: '#DDA3B7', hue: 115 },
-  plum:      { n: 'Plum',      a: '#7444D4', ink: '#5B32B2', mid: '#8862DA', tint: '#F3EEFD', dim: '#B7A4E2', hue: 35 },
-  sage:      { n: 'Sage',      a: '#2F8A5B', ink: '#236B46', mid: '#4C9A70', tint: '#ECF6F0', dim: '#98C2AA', hue: -85 },
-  tangerine: { n: 'Tangerine', a: '#E0601F', ink: '#BA4B13', mid: '#DE7C46', tint: '#FDF1EA', dim: '#E5B293', hue: 155 },
-  ocean:     { n: 'Ocean',     a: '#0A8299', ink: '#086678', mid: '#3497AA', tint: '#E8F6F8', dim: '#8FC3CD', hue: -38 },
-  ink:       { n: 'Ink',       a: '#22252E', ink: '#111318', mid: '#545A6B', tint: '#EFF0F3', dim: '#A1A6B3', hue: null }
+  cobalt: { n: 'Blue',  a: '#2149E8', ink: '#1E3FC8', mid: '#4A67E0', tint: '#EEF1FF', dim: '#8E9BD0', hue: 0, icon: '' },
+  ink:    { n: 'Black', a: '#22252E', ink: '#111318', mid: '#545A6B', tint: '#EFF0F3', dim: '#A1A6B3', hue: null, icon: '-ink' }
 };
 let THEME = 'cobalt';
 try { const t = localStorage.getItem('hum_theme'); if (t && THEMES[t]) THEME = t; } catch (e) {}
@@ -1288,10 +1354,13 @@ function applyTheme(k) {
   r.setProperty('--accent', t.a); r.setProperty('--accent-ink', t.ink); r.setProperty('--accent-mid', t.mid);
   r.setProperty('--accent-tint', t.tint); r.setProperty('--accent-dim', t.dim);
   r.setProperty('--art-filter', t.hue === null ? 'grayscale(1) brightness(.55)' : t.hue ? `hue-rotate(${t.hue}deg)` : 'none');
-  const m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', '#ffffff');
+  const m = document.querySelector('meta[name="theme-color"]'); if (m && !document.getElementById('splash')) m.setAttribute('content', '#ffffff');
+  // the icon a phone saves when you install: blue tile or black tile, matching the theme at that moment
+  const mf = document.querySelector('link[rel="manifest"]'); if (mf) mf.setAttribute('href', t.icon ? 'manifest-ink.webmanifest' : 'manifest.webmanifest');
+  const ati = document.querySelector('link[rel="apple-touch-icon"]'); if (ati && /^https?:$/.test(location.protocol)) ati.setAttribute('href', `apple-touch-icon${t.icon}.png`);
   THEME = k; try { localStorage.setItem('hum_theme', k); } catch (e) {}
 }
-const themeSwatches = () => Object.entries(THEMES).map(([k, t]) => `<button class="press theme-sw" data-act="theme" data-k="${k}" aria-pressed="${k === THEME}" aria-label="${t.n}" title="${t.n}" style="--c:${t.a}"><span class="rec" aria-hidden="true"><span class="lbl"></span><span class="hole"></span></span></button>`).join('');
+const themeSwatches = () => Object.entries(THEMES).map(([k, t]) => `<button class="press theme-sw" data-act="theme" data-k="${k}" aria-pressed="${k === THEME}" aria-label="${t.n}" style="--c:${t.a}"><span class="rec" aria-hidden="true"><span class="lbl"></span><span class="hole"></span></span><span class="theme-lbl">${t.n}</span></button>`).join('');
 applyTheme(THEME);
 
 
@@ -1375,7 +1444,7 @@ function profileSheet() {
       </div>
       ${paired() ? '' : `<button class="press ob-btn" data-act="invitesheet" style="margin-top:4px">${PAIR.state === 'pending' ? 'See your invite' : 'Invite your person'}</button>`}
       <div class="theme-card">
-        <div class="theme-top"><div><div class="theme-t">Colour</div><div class="theme-s">how humm.. looks for you</div></div><span class="theme-pill"><i></i><span class="theme-name">${THEMES[THEME].n}</span></span></div>
+        <div class="theme-top"><div><div class="theme-t">Colour</div><div class="theme-s">your splash and app icon follow it too</div></div></div>
         <div class="theme-row" role="group" aria-label="App colour">${themeSwatches()}</div>
       </div>
       <button class="press ob-btn ghost" data-act="relocate" style="margin-top:6px">Update my location</button>
@@ -2682,7 +2751,7 @@ app.addEventListener('click', e => {
     case 'delsong': deleteSong(d.id); break;
     case 'install': if (INST.prompt) { const pr = INST.prompt; INST.prompt = null; pr.prompt(); pr.userChoice.then(c => { if (c.outcome !== 'accepted') render(); }); render(); } break;
     case 'hideinstall': INST.hidden = true; try { localStorage.setItem('hum_install_hidden', '1'); } catch (e) {} render(); break;
-    case 'theme': { applyTheme(d.k); const row = b.closest('.theme-row'); if (row) row.innerHTML = themeSwatches(); const tn = app.querySelector('.theme-name'); if (tn) tn.textContent = THEMES[THEME].n; fitAll(); break; }
+    case 'theme': { applyTheme(d.k); const row = b.closest('.theme-row'); if (row) row.innerHTML = themeSwatches(); const tn = app.querySelector('.theme-name'); if (tn) tn.textContent = THEMES[THEME].n; if (INST.standalone()) flash('Splash updated · the home-screen icon changes if you reinstall'); fitAll(); break; }
     case 'relocate': S.profile = false; OB.acc = acct.load() || OB.acc; OB.relocating = true; OB.cityQ = ''; obGo('location'); break;
     case 'signout': S.profile = false; acct.clear(); OB.acc = null; OB.form = {}; Object.assign(S, { session: null, overlay: null, playing: false }); obGo('welcome'); flash('Signed out'); break;
     case 'playfor': {
