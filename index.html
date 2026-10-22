@@ -942,6 +942,18 @@ html,body{overflow:hidden;overscroll-behavior:none}
 .inv-actions .ob-btn.ghost{background:#fff}
 .inv-sheet{overflow-y:auto;scrollbar-width:none}
 .inv-sheet-foot{display:flex;flex-direction:column;gap:6px;margin-top:20px}
+
+/* swipe-to-delete rows */
+.sw-row{position:relative;overflow:hidden;border-radius:14px;touch-action:pan-y;transition:height .26s ease,opacity .26s ease}
+.sw-row .song-row{position:relative;z-index:1;background:#fff;touch-action:pan-y;user-select:none;-webkit-user-select:none;will-change:transform}
+.sw-del{position:absolute;right:0;top:4px;bottom:4px;width:84px;border-radius:14px;background:#E5484D;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:700;opacity:0;transition:opacity .2s}
+.sw-row.open .sw-del,.sw-row:has(.song-row[style*="translateX"]) .sw-del{opacity:1}
+.sw-row.removing{opacity:0}
+.undo-bar{position:absolute;left:16px;right:16px;bottom:calc(104px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 16px;border-radius:16px;background:var(--ink);color:#fff;font-size:13.5px;font-weight:500;box-shadow:0 12px 30px rgba(20,20,30,.25);animation:toastUp .28s cubic-bezier(.2,.8,.2,1) both}
+.undo-bar span{flex:1;min-width:0}
+.undo-bar button{height:36px;padding:0 14px;border-radius:10px;background:rgba(255,255,255,.14);color:#fff;font-size:13.5px;font-weight:700}
+.undo-bar.out{opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
+@keyframes toastUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
@@ -1959,7 +1971,9 @@ function listRows() {
   if (!ids.length) return `<div style="padding:50px 40px;text-align:center"><div style="font-size:15px;font-weight:700">Nothing called “${esc(S.query)}” yet</div>
     <div class="muted" style="font-size:13px;margin-top:6px">Add it from the Add song tab.</div></div>`;
   return ids.map((id, n) => { const s = song(id), by = who(s.by), cur = S.curId === id;
-    return `<button class="press song-row ${cur ? 'cur' : ''}" data-act="play" data-id="${id}" data-ctx="Our Songs" aria-label="Play ${esc(s.t)} by ${esc(s.a)}">
+    return `<div class="sw-row" data-id="${id}">
+    <button class="sw-del" data-act="delsong" data-id="${id}" aria-label="Delete ${esc(s.t)}" tabindex="-1">${icoTrash}<span>Delete</span></button>
+    <button class="press song-row ${cur ? 'cur' : ''}" data-act="play" data-id="${id}" data-ctx="Our Songs" aria-label="Play ${esc(s.t)} by ${esc(s.a)}">
       <span class="sr-num">${cur ? eq() : String(n + 1).padStart(2, '0')}</span>
       ${cover(s, 52, 12)}
       <span class="sr-text">
@@ -1968,7 +1982,7 @@ function listRows() {
       </span>
       <span class="sr-note">${notesOf(id).length ? `<span title="There's a note on this one">${icoPaper}</span>` : ''}</span>
       <span class="sr-dur">${fmt(s.d)}</span>
-    </button>`; }).join('');
+    </button></div>`; }).join('');
 }
 function historyList() {
   const days = [];
@@ -2442,6 +2456,67 @@ function installCard() {
       <button class="press ask-off" data-act="hideinstall">${INST.prompt ? 'Not now' : 'Got it'}</button>
     </div></div></div>`;
 }
+
+/* ----- swipe a song left to delete (with undo) ----- */
+const icoTrash = svg(18, '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>', 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"');
+const SW_OPEN = 92;
+let DELETED = []; try { DELETED = JSON.parse(localStorage.getItem('hum_deleted') || '[]'); } catch (e) {}
+DELETED.forEach(id => { const i = ALL.indexOf(id); if (i > -1) ALL.splice(i, 1); });
+const saveDeleted = () => { try { localStorage.setItem('hum_deleted', JSON.stringify(DELETED)); } catch (e) {} };
+let swipe = null, swipeOpen = null, swipeJustMoved = 0;
+const swRow = el => el && el.closest && el.closest('.sw-row');
+function swSet(row, x, anim) { const b = row.querySelector('.song-row'); b.style.transition = anim ? 'transform .28s cubic-bezier(.2,.8,.2,1)' : 'none'; b.style.transform = x ? `translateX(${x}px)` : ''; row.classList.toggle('open', x <= -SW_OPEN / 2); }
+function swClose(except) { if (swipeOpen && swipeOpen !== except && swipeOpen.isConnected) swSet(swipeOpen, 0, true); if (swipeOpen !== except) swipeOpen = null; }
+app.addEventListener('pointerdown', e => {
+  const row = swRow(e.target); if (!row || e.target.closest('.sw-del')) { if (!row) swClose(); return; }
+  swClose(row);
+  swipe = { row, x0: e.clientX, y0: e.clientY, base: row === swipeOpen ? -SW_OPEN : 0, dx: 0, dir: null, id: e.pointerId };
+});
+app.addEventListener('pointermove', e => {
+  if (!swipe || e.pointerId !== swipe.id) return;
+  const dx = e.clientX - swipe.x0, dy = e.clientY - swipe.y0;
+  if (!swipe.dir) { if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return; swipe.dir = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'; }
+  if (swipe.dir !== 'x') return;
+  swipe.dx = dx; let x = swipe.base + dx;
+  x = x > 0 ? 0 : x < -SW_OPEN ? -SW_OPEN - (-SW_OPEN - x) * 0.25 : x;   // rubber band past the button
+  swSet(swipe.row, x, false);
+});
+const swEnd = e => {
+  if (!swipe || (e && e.pointerId !== swipe.id)) return;
+  const sw = swipe; swipe = null;
+  if (sw.dir !== 'x') return;
+  swipeJustMoved = Date.now();
+  const open = sw.base + sw.dx < -SW_OPEN / 2;
+  swSet(sw.row, open ? -SW_OPEN : 0, true); swipeOpen = open ? sw.row : null;
+};
+app.addEventListener('pointerup', swEnd); app.addEventListener('pointercancel', swEnd);
+app.addEventListener('click', e => {   // a swipe isn't a tap; a tap on an open row just closes it
+  const row = swRow(e.target);
+  if (row && !e.target.closest('.sw-del') && (Date.now() - swipeJustMoved < 350 || row === swipeOpen)) { e.stopImmediatePropagation(); e.preventDefault(); if (row === swipeOpen && Date.now() - swipeJustMoved >= 350) swClose(); }
+}, true);
+let undoT;
+function deleteSong(id) {
+  const row = app.querySelector(`.sw-row[data-id="${id}"]`), idx = ALL.indexOf(id); if (idx < 0) return;
+  const s = song(id);
+  const finish = () => {
+    ALL.splice(idx, 1); DELETED.push(id); saveDeleted(); swipeOpen = null;
+    if (S.curId === id) { audio.pause(); S.playing = false; S.hasPlayed = ALL.length ? S.hasPlayed : false; const nx = ALL[Math.min(idx, ALL.length - 1)]; if (nx) S.curId = nx; if (S.overlay === 'player') S.overlay = null; }
+    render();
+    undoBar(`Removed “${s.t}”`, () => {
+      DELETED = DELETED.filter(x => x !== id); saveDeleted(); ALL.splice(Math.min(idx, ALL.length), 0, id);
+      render();
+    });
+  };
+  if (row) { row.style.height = row.offsetHeight + 'px'; row.classList.add('removing'); requestAnimationFrame(() => { row.style.height = '0px'; }); setTimeout(finish, 260); }
+  else finish();
+}
+function undoBar(msg, onUndo) {
+  clearTimeout(undoT); app.querySelectorAll('.undo-bar').forEach(x => x.remove());
+  app.insertAdjacentHTML('beforeend', `<div class="undo-bar" role="status"><span class="ell">${esc(msg)}</span><button class="press" data-undo>Undo</button></div>`);
+  const bar = app.querySelector('.undo-bar');
+  bar.querySelector('[data-undo]').addEventListener('click', ev => { ev.stopPropagation(); clearTimeout(undoT); bar.remove(); onUndo(); flash('Back in Our Songs'); });
+  undoT = setTimeout(() => { bar.classList.add('out'); setTimeout(() => bar.remove(), 250); }, 5000);
+}
 let bannerT, pendingRender = false;
 /* background events (partner activity) wait while you're typing, so the field never loses focus mid-word */
 function softRender() {
@@ -2604,6 +2679,7 @@ app.addEventListener('click', e => {
     case 'appjoin': S.inviteSheet = false; OB.acc = acct.load(); OB.fromApp = true; obGo('join'); break;
     case 'profile': S.profile = true; render(); break;
     case 'closeprofile': S.profile = false; render(); break;
+    case 'delsong': deleteSong(d.id); break;
     case 'install': if (INST.prompt) { const pr = INST.prompt; INST.prompt = null; pr.prompt(); pr.userChoice.then(c => { if (c.outcome !== 'accepted') render(); }); render(); } break;
     case 'hideinstall': INST.hidden = true; try { localStorage.setItem('hum_install_hidden', '1'); } catch (e) {} render(); break;
     case 'theme': { applyTheme(d.k); const row = b.closest('.theme-row'); if (row) row.innerHTML = themeSwatches(); const tn = app.querySelector('.theme-name'); if (tn) tn.textContent = THEMES[THEME].n; fitAll(); break; }
