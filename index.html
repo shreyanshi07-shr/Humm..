@@ -926,6 +926,22 @@ html,body{overflow:hidden;overscroll-behavior:none}
 .theme-sw[aria-pressed="true"] .lbl{width:58%;height:58%}
 .theme-sw:active .rec{transform:scale(.94)}
 @media (prefers-reduced-motion:reduce){.theme-sw[aria-pressed="true"] .rec{animation:none}}
+
+/* solo mode */
+.pair-empty{background:#fff!important;color:var(--accent)!important;border:1.5px dashed var(--accent-dim)!important;font-weight:600;box-sizing:border-box}
+.pin.empty{background:#fff;color:var(--accent);border:1.5px dashed var(--accent-dim);box-sizing:border-box}
+.inv-dash{width:34px;height:0;border-top:1.5px dashed var(--accent-dim)}
+.inv-hero{border-radius:26px;padding:22px 20px 20px;background:var(--accent-tint);text-align:center;display:flex;flex-direction:column;align-items:center}
+.inv-pair{display:flex;align-items:center;gap:8px}
+.inv-hero .pin.a{background:#fff}
+.inv-t{margin-top:14px;font-family:'Fraunces','Georgia',serif;font-size:22px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.inv-p{margin:6px 0 0;max-width:290px;font-size:13.5px;line-height:1.5;color:var(--muted)}
+.inv-p b{color:var(--accent);font-family:'DM Mono',monospace;font-weight:500}
+.inv-actions{display:flex;gap:8px;margin-top:16px;width:100%;max-width:300px}
+.inv-actions .ob-btn{flex:1}
+.inv-actions .ob-btn.ghost{background:#fff}
+.inv-sheet{overflow-y:auto;scrollbar-width:none}
+.inv-sheet-foot{display:flex;flex-direction:column;gap:6px;margin-top:20px}
 </style>
 </head>
 <body>
@@ -996,11 +1012,17 @@ const initials = n => (n || '?').trim().charAt(0).toUpperCase();
 const inviteCode = () => 'HUM-' + Math.random().toString(36).slice(2, 6).toUpperCase();
 
 /* apply a saved/finished account to the people the app shows */
+const PAIR = { state: 'none', name: '', code: '' };   // none | pending | paired
+const paired = () => PAIR.state === 'paired';
 function applyAccount(a) {
   ME.name = a.me.name; ME.ini = initials(a.me.name);
-  if (a.partner) {
+  const pp = a.partner;
+  PAIR.state = pp ? (pp.accepted ? 'paired' : 'pending') : 'none';
+  PAIR.name = pp ? pp.name : ''; PAIR.code = pp ? pp.code : '';
+  if (!pp || !pp.accepted) { P.name = pp ? pp.name : 'your person'; P.ini = pp ? initials(pp.name) : '+'; }
+  if (a.partner && a.partner.accepted) {
     P.name = a.partner.name; P.ini = initials(a.partner.name);
-    P.city = a.partner.city; P.tz = a.partner.tz;
+    P.city = a.partner.city || P.city; P.tz = a.partner.tz || P.tz;
   }
   if (a.me.loc && a.partner && a.partner.lat != null) {
     const km = kmBetween(a.me.loc, a.partner);
@@ -1011,7 +1033,7 @@ function applyAccount(a) {
 const OB = { step: null, form: {}, err: '', code: '', locBusy: false, cityQ: '' };
 (function boot() {
   const a = acct.load();
-  if (a && a.me && a.partner && a.partner.accepted) { applyAccount(a); return; }
+  if (a && a.me && a.me.loc && ((a.partner && a.partner.accepted) || a.solo)) { applyAccount(a); return; }
   OB.step = a && a.me ? (a.me.loc ? (a.partner ? 'waiting' : 'invite') : 'location') : 'welcome';
   OB.acc = a || null;
   if (a && a.partner) OB.code = a.partner.code;
@@ -1174,6 +1196,7 @@ function onboardView() {
       </div>
       <div class="ob-foot">
         <button class="press ob-btn" data-act="obinvite">Send invite</button>
+        <button class="press ob-btn ghost" data-act="obskip">Skip for now</button>
         <button class="press ob-link" data-act="ob" data-to="join">They invited me? <b>Enter their code</b></button>
       </div>
     </div>`;
@@ -1197,7 +1220,7 @@ function onboardView() {
       <div class="ob-foot">
         <button class="press ob-btn" data-act="obshare">Share invite link</button>
         <button class="press ob-link" data-act="obaccept">Preview: <b>${esc(pn)} accepts</b></button>
-        <button class="press ob-link" data-act="obchange" style="margin-top:0">Invite someone else</button>
+        <button class="press ob-link" data-act="obskip" style="margin-top:0">Go to the app, <b>I'll wait</b></button>
       </div>
     </div>`;
     }
@@ -1259,6 +1282,69 @@ function applyTheme(k) {
 const themeSwatches = () => Object.entries(THEMES).map(([k, t]) => `<button class="press theme-sw" data-act="theme" data-k="${k}" aria-pressed="${k === THEME}" aria-label="${t.n}" title="${t.n}" style="--c:${t.a}"><span class="rec" aria-hidden="true"><span class="lbl"></span><span class="hole"></span></span></button>`).join('');
 applyTheme(THEME);
 
+
+/* ----- solo mode: invite your person from inside the app ----- */
+function inviteHero() {
+  const pending = PAIR.state === 'pending';
+  return `<div class="px" style="margin-top:18px"><section class="inv-hero" aria-label="Invite your person">
+    <div class="inv-pair" aria-hidden="true"><span class="pin a">${esc(ME.ini)}</span>${pending ? '<span class="wait-line"><i></i><i></i><i></i></span>' : '<span class="inv-dash"></span>'}<span class="pin b ${pending ? 'waiting' : 'empty'}">${pending ? esc(initials(PAIR.name)) : '+'}</span></div>
+    <div class="inv-t">${pending ? `Waiting for ${esc(PAIR.name)}` : 'humm.. is better for two'}</div>
+    <p class="inv-p">${pending ? `Your invite is out. Share the code <b>${esc(PAIR.code)}</b> in case it's hiding in spam.` : 'Invite your person to listen together, leave little notes and see how far apart you are.'}</p>
+    <div class="inv-actions">
+      ${pending ? `<button class="press ob-btn small" data-act="appshare">Share invite link</button><button class="press ob-btn small ghost" data-act="invitesheet">Details</button>`
+        : `<button class="press ob-btn small" data-act="invitesheet">Invite your person</button>`}
+    </div>
+  </section></div>`;
+}
+function inviteSheet() {
+  const a = acct.load(); if (!a) return '';
+  const pending = a.partner && !a.partner.accepted, f = OB.form || {};
+  const err = S.invErr ? `<div class="ob-err" role="alert" style="margin-top:4px">${esc(S.invErr)}</div>` : '';
+  const body = pending ? `
+      <div class="wait-pair" style="margin:4px auto 0" aria-hidden="true"><span class="pin a big">${esc(ME.ini)}</span><span class="wait-line"><i></i><i></i><i></i></span><span class="pin b big waiting">${esc(initials(a.partner.name))}</span></div>
+      <div class="ob-h" style="text-align:center;font-size:26px;margin-top:14px">Waiting for ${esc(a.partner.name)}</div>
+      <p class="ob-p" style="text-align:center">They'll land in your little corner as soon as they accept.</p>
+      <div class="code-card" style="margin:18px auto 0;text-align:center">
+        <div class="mono-label" style="font-family:'DM Mono',monospace!important">your invite code</div>
+        <div class="code">${esc(a.partner.code)}</div>
+        <div class="code-link">humm.app/join/${esc(a.partner.code)}</div>
+        <button class="press ob-link" data-act="appcopy" style="margin-top:6px;min-height:32px"><b>Copy code</b></button>
+      </div>
+      <div class="inv-sheet-foot">
+        <button class="press ob-btn" data-act="appshare">Share invite link</button>
+        <button class="press ob-link" data-act="appaccept">Preview: <b>${esc(a.partner.name)} accepts</b></button>
+        <button class="press ob-link" data-act="appchange" style="margin-top:0">Invite someone else</button>
+      </div>` : `
+      <div style="color:var(--accent);display:flex;justify-content:center">${flower(64)}</div>
+      <div class="ob-h" style="text-align:center;font-size:26px;margin-top:8px">Invite your person</div>
+      <p class="ob-p" style="text-align:center">They'll get a link to join. Once they accept, it's just the two of you.</p>
+      <div class="ob-form" style="margin-top:18px">
+        <label class="ob-field"><span>Their name</span><input id="invName" type="text" placeholder="e.g. Kabir" value="${esc(f.pname || '')}" autocomplete="off"></label>
+        <label class="ob-field"><span>Their phone or email</span><input id="invContact" type="text" placeholder="so we can send the invite" value="${esc(f.pcontact || '')}" autocomplete="off"></label>
+        ${err}
+      </div>
+      <div class="inv-sheet-foot">
+        <button class="press ob-btn" data-act="appinvite">Send invite</button>
+        <button class="press ob-link" data-act="appjoin">They invited me? <b>Enter their code</b></button>
+      </div>`;
+  return `<div class="sheet-wrap">
+    <button class="sheet-backdrop ${OPENED.invite ? 'fadeIn' : ''}" data-act="closeinvite" aria-label="Close"></button>
+    <div class="note-sheet inv-sheet ${OPENED.invite ? 'sheetUp' : ''}" style="background:#fff" role="dialog" aria-label="Invite your person">
+      <div style="width:40px;height:5px;border-radius:3px;background:#E3E4E8;margin:0 auto 14px"></div>
+      ${body}
+    </div>
+  </div>`;
+}
+function appInvite() {
+  const name = (document.getElementById('invName') || {}).value || '', contact = (document.getElementById('invContact') || {}).value || '';
+  OB.form = Object.assign(OB.form || {}, { pname: name.trim(), pcontact: contact.trim() });
+  if (!name.trim()) { S.invErr = 'Who are you inviting?'; return render(); }
+  if (!contact.trim()) { S.invErr = 'Add their phone or email so the invite reaches them'; return render(); }
+  S.invErr = '';
+  const a = acct.load(); a.partner = { name: name.trim(), contact: contact.trim(), code: inviteCode(), accepted: false }; a.solo = true; acct.save(a);
+  applyAccount(a); render(); flash(`Invite sent to ${name.trim()}`);
+}
+
 /* profile sheet (tap the avatars on Home) */
 function profileSheet() {
   const a = acct.load(); if (!a) return '';
@@ -1266,14 +1352,16 @@ function profileSheet() {
     <button class="sheet-backdrop ${OPENED.profile ? 'fadeIn' : ''}" data-act="closeprofile" aria-label="Close"></button>
     <div class="note-sheet ${OPENED.profile ? 'sheetUp' : ''}" style="background:#fff" role="dialog" aria-label="Your profile">
       <div style="width:40px;height:5px;border-radius:3px;background:#E3E4E8;margin:0 auto 16px"></div>
-      <div class="wait-pair" style="margin:0 auto" aria-hidden="true"><span class="pin a big">${esc(ME.ini)}</span><span class="joined-heart">${I.heart('currentColor', 18)}</span><span class="pin b big">${esc(P.ini)}</span></div>
-      <div class="ob-h" style="text-align:center;font-size:26px;margin-top:14px">${esc(ME.name)} & ${esc(P.name)}</div>
+      <div class="wait-pair" style="margin:0 auto" aria-hidden="true"><span class="pin a big">${esc(ME.ini)}</span>${paired() ? `<span class="joined-heart">${I.heart('currentColor', 18)}</span><span class="pin b big">${esc(P.ini)}</span>` : '<span class="inv-dash"></span><span class="pin b big empty">+</span>'}</div>
+      <div class="ob-h" style="text-align:center;font-size:26px;margin-top:14px">${paired() ? esc(ME.name) + ' & ' + esc(P.name) : esc(ME.name)}</div>
       <div class="prof-rows">
         <div><span>You</span><b>${esc(a.me.loc && a.me.loc.city ? a.me.loc.city : 'location not shared')}</b></div>
-        <div><span>${esc(P.name)}</span><b>${esc(P.city)} · ${nowTime(P.tz)}</b></div>
-        <div><span>Distance</span><b>${P.km ? P.km + (/km$/.test(P.km) ? ' apart' : '') : '—'}</b></div>
+        ${paired() ? `<div><span>${esc(P.name)}</span><b>${esc(P.city)} · ${nowTime(P.tz)}</b></div>
+        <div><span>Distance</span><b>${P.km ? P.km + (/km$/.test(P.km) ? ' apart' : '') : '—'}</b></div>`
+        : `<div><span>Your person</span><b>${PAIR.state === 'pending' ? 'invite sent to ' + esc(PAIR.name) : 'not connected yet'}</b></div>`}
         <div><span>Signed in as</span><b>${esc(a.me.email || '')}</b></div>
       </div>
+      ${paired() ? '' : `<button class="press ob-btn" data-act="invitesheet" style="margin-top:4px">${PAIR.state === 'pending' ? 'See your invite' : 'Invite your person'}</button>`}
       <div class="theme-card">
         <div class="theme-top"><div><div class="theme-t">Colour</div><div class="theme-s">how humm.. looks for you</div></div><span class="theme-pill"><i></i><span class="theme-name">${THEMES[THEME].n}</span></span></div>
         <div class="theme-row" role="group" aria-label="App colour">${themeSwatches()}</div>
@@ -1308,7 +1396,7 @@ function obLogin() {
   const saved = acct.load();
   if (saved && saved.me && saved.me.email === email) {
     OB.acc = saved;
-    if (saved.partner && saved.partner.accepted) return finishOnboarding(false);
+    if ((saved.partner && saved.partner.accepted) || (saved.solo && saved.me.loc)) return finishOnboarding(false);
     return obGo(saved.me.loc ? (saved.partner ? 'waiting' : 'invite') : 'location');
   }
   OB.err = 'We couldn’t find that account on this device. Create one instead?'; render();
@@ -1361,6 +1449,11 @@ function obJoin() {
 function freshStart() {
   Object.assign(S, { history: [], messages: [], notes: {}, playing: false, progress: 0, session: null,
     partner: { status: 'idle', songId: null, prog: 0 }, notifyAsk: S.notifyAsk, hasPlayed: false });
+}
+function obSkip() {
+  OB.acc.solo = true; acct.save(OB.acc);
+  freshStart(); applyAccount(OB.acc); OB.step = null; S.tab = 'home'; S.overlay = null; render();
+  flash(PAIR.state === 'pending' ? `We'll let you know when ${PAIR.name} joins` : 'You can invite your person any time');
 }
 function finishOnboarding(celebrate = true) {
   if (celebrate) freshStart();
@@ -1589,7 +1682,8 @@ const avatar = (p, size, live) =>
 const pair = (size = 30) =>
   `<div style="display:flex;align-items:center">
      <div class="avatar" style="width:${size}px;height:${size}px;background:${ME.col};color:${ME.tc};font-size:${Math.round(size * .42)}px;border:2px solid #fff;font-family:Quicksand,sans-serif">${ME.ini}</div>
-     <div class="avatar" style="width:${size}px;height:${size}px;background:${P.col};color:${P.tc};font-size:${Math.round(size * .42)}px;border:2px solid #fff;margin-left:-${Math.round(size * .3)}px;font-family:Quicksand,sans-serif">${P.ini}</div>
+     ${paired() ? `<div class="avatar" style="width:${size}px;height:${size}px;background:${P.col};color:${P.tc};font-size:${Math.round(size * .42)}px;border:2px solid #fff;margin-left:-${Math.round(size * .3)}px;font-family:Quicksand,sans-serif">${P.ini}</div>`
+       : `<div class="avatar pair-empty" style="width:${size}px;height:${size}px;margin-left:-${Math.round(size * .3)}px;font-size:${Math.round(size * .5)}px">+</div>`}
    </div>`;
 
 let arcN = 0;
@@ -1713,14 +1807,14 @@ function home() {
   return `<div class="pad">
     <div class="sticky-head"><div class="px top-bar">
       <div class="logo" aria-label="humm">humm<span class="logo-dots">..</span></div>
-      <button class="press pair-badge" data-act="profile" aria-label="${ME.name} & ${P.name}: profile">${pair(30)}</button>
+      <button class="press pair-badge" data-act="profile" aria-label="${paired() ? ME.name + ' & ' + P.name + ': profile' : 'Your profile'}">${pair(30)}</button>
     </div></div>
     <div class="px home-greet">
       <h1 class="h-xl">${greeting()}, ${ME.name}</h1>
-      ${kmLine() ? `<div class="blue-sub" style="margin-top:4px">${kmLine()} · ${nowTime(P.tz)} in ${P.city}</div>` : `<button class="press blue-sub" data-act="relocate" style="margin-top:4px;text-decoration:underline">Share your location to see how far apart you are</button>`}
+      ${!paired() ? `<button class="press blue-sub" data-act="invitesheet" style="margin-top:4px;text-align:left">${PAIR.state === 'pending' ? `waiting for ${esc(PAIR.name)} to join` : 'just you, for now'}</button>` : kmLine() ? `<div class="blue-sub" style="margin-top:4px">${kmLine()} · ${nowTime(P.tz)} in ${P.city}</div>` : `<button class="press blue-sub" data-act="relocate" style="margin-top:4px;text-decoration:underline">Share your location to see how far apart you are</button>`}
     </div>
 
-    ${S.notifyAsk ? `<div class="px" style="margin-top:16px"><div class="ask-card fadeIn">
+    ${S.notifyAsk && paired() ? `<div class="px" style="margin-top:16px"><div class="ask-card fadeIn">
       <span class="ask-ico">${svg(20, '<path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/>', 'fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"')}</span>
       <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Get a ping on your phone</div><div class="blue-sub" style="margin-top:2px">when ${P.name} starts listening or writes to you</div></div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:stretch">
@@ -1728,7 +1822,7 @@ function home() {
         <button class="press ask-off" data-act="skipnotify">Not now</button>
       </div></div></div>` : ''}
     ${installCard()}
-    <div class="px" style="margin-top:18px">
+    ${!paired() ? inviteHero() : `<div class="px" style="margin-top:18px">
       <section class="np-widget ${S.playing && live ? 'spinning' : listening ? 'spinning' : ''}" aria-label="${P.name}'s listening status">
         <div class="np-bg">${hs.img ? `<img src="${hs.img}" alt="">` : `<div style="position:absolute;inset:0;background:${hs.c1}"></div>`}</div>
         <div class="np-tint"></div>
@@ -1750,13 +1844,13 @@ function home() {
           <svg class="np-arm" width="56" height="110" viewBox="0 0 56 110"><circle cx="40" cy="14" r="11" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="1.5"/><circle cx="40" cy="14" r="4" fill="#3A3D44"/><path d="M40 14 L40 70 Q40 84 30 92" fill="none" stroke="#9CA0A8" stroke-width="3.5" stroke-linecap="round"/><rect x="21" y="86" width="12" height="20" rx="3" transform="rotate(28 27 96)" fill="#2C2F35"/></svg>
         </div>
       </section>
-    </div>
+    </div>`}
 
     <div class="px sec-head"><h2>Recently played</h2>${recentRows().length ? '<button class="press see-all" data-act="history">See all</button>' : ''}</div>
     <div class="px" style="display:flex;flex-direction:column">
       ${recentRows().length ? '' : `<div class="empty-card">
         <div class="empty-ico">${svg(22, '<path d="M9 18V6l11-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/>', 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"')}</div>
-        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Nothing played yet</div><div class="muted" style="font-size:13px;margin-top:2px">Songs you two play will show up here</div></div>
+        <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700">Nothing played yet</div><div class="muted" style="font-size:13px;margin-top:2px">${paired() ? 'Songs you two play will show up here' : 'Songs you play will show up here'}</div></div>
         <button class="press empty-btn" data-act="tab" data-tab="songs">Browse</button>
       </div>`}
       ${recentRows().map(h => { const s = song(h.id), cur = S.curId === s.id;
@@ -1771,7 +1865,15 @@ function home() {
         </button>`; }).join('')}
     </div>
 
-    <div class="px">
+    ${!paired() ? `<div class="px"><section class="letter" aria-label="Little notes">
+        <span style="color:var(--accent);display:flex">${flower(96)}</span>
+        <div class="letter-body">
+          <p>no one to write to yet.</p>
+          <p>${PAIR.state === 'pending' ? `once ${esc(PAIR.name.toLowerCase())} joins, your little notes will land here.` : 'invite your person and your first little note will be waiting for them.'}</p>
+        </div>
+        <button class="press letter-btn" data-act="invitesheet">${PAIR.state === 'pending' ? 'See your invite' : 'Invite your person'}</button>
+      </section></div>` : ''}
+    <div class="px" style="${paired() ? '' : 'display:none'}">
       <section class="letter" aria-label="A note from ${P.name}">
         <span style="color:var(--accent);display:flex">${flower(96)}</span>
         <button class="press letter-count" data-act="allnotes" aria-label="Read all your notes">${(() => { const n = S.messages.length + Object.values(S.notes).reduce((c, x) => c + x.length, 0); return n ? `<b>${n}</b><span>little notes between you</span>` : `<span>just between</span><b>you two</b>`; })()}</button>
@@ -1898,7 +2000,7 @@ function songsScreen() {
       <div><h1 class="title sh-title">Our Songs</h1></div>
       <button class="icon-btn press" data-act="togglesearch" aria-label="Search our songs" style="background:${S.searchOpen ? 'var(--accent-soft)' : '#EFEFF1'};color:${S.searchOpen ? 'var(--accent)' : 'var(--lav-ink)'}">${I.search(20)}</button>
     </div>
-    <div class="px muted sh-hide" style="font-size:13px;margin-top:6px">${ME.name} & ${P.name} · ${ALL.length} songs · ${together} min together this week</div>
+    <div class="px muted sh-hide" style="font-size:13px;margin-top:6px">${paired() ? `${ME.name} & ${P.name} · ${ALL.length} songs · ${together} min together this week` : `${ME.name} · ${ALL.length} songs`}</div>
     ${S.searchOpen ? `<div class="px fadeIn" style="padding-top:14px">
       <label for="q" class="sr-only">Search our songs</label>
       <div class="search-box">${I.search(18)}
@@ -1992,7 +2094,7 @@ function player(anim) {
     <div class="pl-info">
       <div class="display ell" style="font-size:clamp(22px,7vw,28px);font-weight:800;letter-spacing:-.02em;color:var(--lav-ink)">${esc(s.t)}</div>
       <div class="display ell" style="font-size:15px;font-weight:600;color:var(--lav-mid);margin-top:3px">${esc(s.a)}</div>
-      <div class="pl-status">${S.session === 'live' ? `<span class="pulse" style="width:7px;height:7px;border-radius:50%;background:#2EAA6E"></span> ${P.name} is hearing this with you` : `${I.eye} ${P.name} can see what you're playing`}</div>
+      <div class="pl-status">${S.session === 'live' ? `<span class="pulse" style="width:7px;height:7px;border-radius:50%;background:#2EAA6E"></span> ${P.name} is hearing this with you` : `${paired() ? `${I.eye} ${P.name} can see what you're playing` : `${I.headphones(14)} invite your person to listen together`}`}</div>
     </div>
 
     <div class="pl-progress">
@@ -2175,21 +2277,21 @@ function render() {
   const focusId = document.activeElement && document.activeElement.id;
   const screenChanged = last.tab !== S.tab;
   const overlayOpened = S.overlay && last.overlay !== S.overlay;
-  OPENED.notes = S.notesOpen && !last.notes; OPENED.profile = S.profile && !last.profile; OPENED.all = S.showAll && !last.all;
+  OPENED.notes = S.notesOpen && !last.notes; OPENED.profile = S.profile && !last.profile; OPENED.all = S.showAll && !last.all; OPENED.invite = S.inviteSheet && !last.invite;
   const body = S.tab === 'home' ? home() : S.tab === 'upload' ? upload() : songsScreen();
   app.innerHTML =
     `<div class="scroll"><div class="${screenChanged ? 'screen' : ''}">${body}</div></div>` +
     (S.hasPlayed === false ? '' : mini()) + navBar() +
     (S.overlay === 'player' ? player(overlayOpened) : '') +
     (S.overlay === 'session' && S.session ? session(overlayOpened) : '') +
-    (S.showAll ? allNotes() : '') + (S.profile ? profileSheet() : '') + banner() + toastHTML() + grain();
+    (S.showAll ? allNotes() : '') + (S.profile ? profileSheet() : '') + (S.inviteSheet ? inviteSheet() : '') + banner() + toastHTML() + grain();
   syncPlaying(); syncAudio(); fitAll();
   const sc = app.querySelector('.scroll'); sc.scrollTop = keep;
   const setStuck = () => app.classList.toggle('stuck', sc.scrollTop > 8);
   sc.addEventListener('scroll', setStuck, { passive: true }); setStuck();
   const notesEl = app.querySelector('#notes'); if (notesEl) notesEl.scrollTop = notesEl.scrollHeight;
   if (focusId) { const f = document.getElementById(focusId); if (f && f.focus) { f.focus(); if (f.setSelectionRange && f.value) f.setSelectionRange(f.value.length, f.value.length); } }
-  last = { tab: S.tab, overlay: S.overlay, notes: S.notesOpen, profile: S.profile, all: S.showAll };
+  last = { tab: S.tab, overlay: S.overlay, notes: S.notesOpen, profile: S.profile, all: S.showAll, invite: S.inviteSheet };
   updateProgress();
 }
 function syncPlaying() {
@@ -2225,7 +2327,7 @@ function play(id, queue, ctx) {
   else {
     if (!(S.history[0] && S.history[0].type === 'A' && S.history[0].id === id)) logHistory({ type: 'A', id });
     S.notesOpen = false; S.replyTo = null;
-    flash(`${P.name} got a ping: you're listening to ${song(id).t}`);
+    if (paired()) flash(`${P.name} got a ping: you're listening to ${song(id).t}`); else render();
     return;
   }
   render();
@@ -2352,7 +2454,7 @@ app.addEventListener('focusout', () => setTimeout(() => {
   if (pendingRender && !(a && a.tagName === 'INPUT' && app.contains(a))) { pendingRender = false; render(); }
 }, 0));
 function partnerStarts(id) {   // Kabir starts a song on his phone → you get a notification
-  if (S.session) return;
+  if (S.session || !paired()) return;
   S.partner = { status: 'listening', songId: id, prog: 0 };
   logHistory({ type: 'K', id, time: new Date().toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }) });
   softRender();
@@ -2419,7 +2521,7 @@ function addSong() {
   logHistory({ type: 'added', by: 'A', id });
   S.up = null; S.tab = 'songs'; S.list = 'songs'; S.query = '';
   play(id, ALL, 'Our Songs');
-  flash(`Added to Our Songs · ${P.name} can listen now`);
+  flash(paired() ? `Added to Our Songs · ${P.name} can listen now` : 'Added to Our Songs');
 }
 document.getElementById('mp3Input').addEventListener('change', e => { pickSong(e.target.files[0]); e.target.value = ''; });
 document.getElementById('coverInput').addEventListener('change', e => { pickCover(e.target.files[0]); e.target.value = ''; });
@@ -2427,6 +2529,9 @@ document.getElementById('coverInput').addEventListener('change', e => { pickCove
 app.addEventListener('click', e => {
   const b = e.target.closest('[data-act]'); if (!b) return;
   const d = b.dataset;
+  if (!onboarding() && !paired() && ['join', 'invite', 'playfor', 'bannerjoin', 'opensession', 'notes', 'compose', 'thinking', 'setstatus', 'allnotes'].includes(d.act)) {
+    S.inviteSheet = true; render(); return;
+  }
   switch (d.act) {
     case 'tab': S.tab = d.tab; S.overlay = null; render(); break;
     case 'play': play(d.id, ALL, d.ctx); break;
@@ -2487,7 +2592,16 @@ app.addEventListener('click', e => {
     case 'obaccept': obAccepted(); break;
     case 'obchange': delete OB.acc.partner; acct.save(OB.acc); obGo('invite'); break;
     case 'objoin': obJoin(); break;
-    case 'obdone': finishOnboarding(); break;
+    case 'obdone': { const fromApp = OB.fromApp; OB.fromApp = false; finishOnboarding(!fromApp); if (fromApp) flash(`You and ${P.name} are connected`); break; }
+    case 'obskip': obSkip(); break;
+    case 'invitesheet': S.inviteSheet = true; S.profile = false; render(); break;
+    case 'closeinvite': S.inviteSheet = false; render(); break;
+    case 'appinvite': appInvite(); break;
+    case 'appshare': OB.acc = acct.load(); obShare(); break;
+    case 'appcopy': OB.acc = acct.load(); obCopy(); break;
+    case 'appaccept': S.inviteSheet = false; OB.acc = acct.load(); OB.fromApp = true; obAccepted(); break;
+    case 'appchange': { const a = acct.load(); delete a.partner; acct.save(a); applyAccount(a); render(); break; }
+    case 'appjoin': S.inviteSheet = false; OB.acc = acct.load(); OB.fromApp = true; obGo('join'); break;
     case 'profile': S.profile = true; render(); break;
     case 'closeprofile': S.profile = false; render(); break;
     case 'install': if (INST.prompt) { const pr = INST.prompt; INST.prompt = null; pr.prompt(); pr.userChoice.then(c => { if (c.outcome !== 'accepted') render(); }); render(); } break;
