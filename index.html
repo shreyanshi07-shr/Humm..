@@ -1104,7 +1104,9 @@ const initials = n => (n || '?').trim().charAt(0).toUpperCase();
 const inviteCode = () => 'HUM-' + Math.random().toString(36).slice(2, 6).toUpperCase();
 
 /* apply a saved/finished account to the people the app shows */
-const PAIR = { state: 'none', name: '', code: '' };   // none | pending | paired
+const PAIR = { state: 'none', name: '', code: '', real: false };
+const validTz = tz => { if (!tz) return false; try { new Intl.DateTimeFormat('en', { timeZone: tz }); return true; } catch (e) { return false; } };
+const simulate = () => !PAIR.real;   // pretend partner activity only for the old demo pairing   // none | pending | paired
 const paired = () => PAIR.state === 'paired';
 function applyAccount(a) {
   ME.name = a.me.name; ME.ini = initials(a.me.name);
@@ -1114,17 +1116,63 @@ function applyAccount(a) {
   if (!pp || !pp.accepted) { P.name = pp ? pp.name : 'your person'; P.ini = pp ? initials(pp.name) : '+'; }
   if (a.partner && a.partner.accepted) {
     P.name = a.partner.name; P.ini = initials(a.partner.name);
-    P.city = a.partner.city || P.city; P.tz = a.partner.tz || P.tz;
+    P.city = a.partner.city || ''; P.tz = validTz(a.partner.tz) ? a.partner.tz : 'UTC';
   }
-  if (a.me.loc && a.partner && a.partner.lat != null) {
+  PAIR.real = !!(a.partner && a.partner.real);
+  if (a.me.loc && a.partner && a.partner.accepted && a.partner.lat != null && a.partner.lon != null) {
     const km = kmBetween(a.me.loc, a.partner);
     P.km = km < 1 ? 'Right next to each other' : km.toLocaleString('en-IN') + ' km';
   } else P.km = null;
 }
 
 const OB = { step: null, form: {}, err: '', code: '', locBusy: false, cityQ: '' };
+/* ----- real invites without a server: the link itself carries who sent it ----- */
+const APP_URL = () => /^https?:$/.test(location.protocol) ? location.origin + location.pathname.replace(/index\.html$/, '') : 'https://humm-amber.vercel.app/';
+const myTz = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch (e) { return ''; } };
+const meParams = a => { const l = a.me.loc || {}; const e = encodeURIComponent; return `n=${e(a.me.name)}&c=${e(l.city || '')}&la=${l.lat != null ? (+l.lat).toFixed(3) : ''}&lo=${l.lon != null ? (+l.lon).toFixed(3) : ''}&tz=${e(myTz())}`; };
+const inviteLink = a => `${APP_URL()}?join=${a.partner.code}&${meParams(a)}`;
+const acceptLink = a => `${APP_URL()}?accept=${a.partner.code}&${meParams(a)}`;
+const shortLink = code => APP_URL().replace(/^https?:\/\//, '') + '?join=' + code;
+const inviteText = a => `${a.me.name} invited you to humm.. ♡ music for two. Tap to join: ${inviteLink(a)}  (code ${a.partner.code})`;
+const acceptText = a => `I'm in on humm.. ♡ Tap this so we're connected: ${acceptLink(a)}`;
+function waNumber(contact) {
+  const d = (contact || '').replace(/[^\d+]/g, ''); if (!d) return null;
+  if (d.startsWith('+')) return d.slice(1);
+  if (d.length === 10) return '91' + d;                 // a 10-digit Indian mobile
+  if (d.length === 11 && d.startsWith('0')) return '91' + d.slice(1);
+  return d.length >= 10 ? d : null;
+}
+function openOut(url) { const w = window.open(url, '_blank'); if (!w) location.href = url; }
+function sendInviteTo(a) {   // WhatsApp for a phone number, email for an email; otherwise the share sheet
+  const contact = (a.partner.contact || '').trim(), text = inviteText(a);
+  if (/^\S+@\S+\.\S+$/.test(contact)) return openOut(`mailto:${encodeURIComponent(contact)}?subject=${encodeURIComponent(a.me.name + ' invited you to humm..')}&body=${encodeURIComponent(text)}`);
+  const n = waNumber(contact); if (n) return openOut(`https://wa.me/${n}?text=${encodeURIComponent(text)}`);
+  shareText(text);
+}
+async function shareText(text) {
+  try { if (navigator.share) { await navigator.share({ title: 'humm..', text }); return; } } catch (e) { return; }
+  openOut(`https://wa.me/?text=${encodeURIComponent(text)}`);
+}
+const fromUrl = (() => {
+  const q = new URLSearchParams(location.search), join = q.get('join'), accept = q.get('accept');
+  if (!join && !accept) return null;
+  try { history.replaceState(null, '', location.pathname); } catch (e) {}
+  const num = v => { const x = parseFloat(v); return isFinite(x) ? x : null; };
+  return { join: join && join.toUpperCase(), accept: accept && accept.toUpperCase(), who: { name: (q.get('n') || '').slice(0, 40), city: (q.get('c') || '').slice(0, 60), lat: num(q.get('la')), lon: num(q.get('lo')), tz: q.get('tz') || '' } };
+})();
 (function boot() {
   const a = acct.load();
+  if (fromUrl && fromUrl.accept && a && a.me && a.partner && !a.partner.accepted) {   // they tapped your link back: you're connected
+    if (a.partner.code === fromUrl.accept) {
+      const w = fromUrl.who;
+      Object.assign(a.partner, { accepted: true, real: true, name: w.name || a.partner.name, city: w.city, lat: w.lat, lon: w.lon, tz: w.tz });
+      acct.save(a); OB.acc = a; applyAccount(a); OB.fromApp = !!a.solo; OB.step = 'connected'; return;
+    }
+  }
+  if (fromUrl && fromUrl.join && !(a && a.partner && a.partner.accepted)) {   // you opened someone's invite link
+    OB.inviter = Object.assign({ code: fromUrl.join }, fromUrl.who); OB.form.code = fromUrl.join;
+    OB.acc = a || null; OB.step = 'join'; return;
+  }
   if (a && a.me && a.me.loc && ((a.partner && a.partner.accepted) || a.solo)) { applyAccount(a); return; }
   OB.step = a && a.me ? (a.me.loc ? (a.partner ? 'waiting' : 'invite') : 'location') : 'welcome';
   OB.acc = a || null;
@@ -1302,16 +1350,16 @@ function onboardView() {
         <span class="pin b big waiting">${esc(initials(pn))}</span>
       </div>
       <h1 class="ob-h" style="margin-top:22px">Waiting for ${esc(pn)}</h1>
-      <p class="ob-p">We've sent your invite. Share the link or code too, in case it's sitting in their spam.</p>
+      <p class="ob-p">Send the invite from WhatsApp, then wait for ${esc(pn)} to join. When they do, they'll send you a link back: tap it and you're connected.</p>
       <div class="code-card">
         <div class="mono-label" style="font-family:'DM Mono',monospace!important">your invite code</div>
         <div class="code">${esc(a.partner.code)}</div>
-        <div class="code-link">humm.app/join/${esc(a.partner.code)}</div>
-        <button class="press ob-link" data-act="obcopy" style="margin-top:6px;min-height:32px"><b>Copy code</b></button>
+        <div class="code-link">${esc(shortLink(a.partner.code))}</div>
+        <button class="press ob-link" data-act="obcopy" style="margin-top:6px;min-height:32px"><b>Copy link</b></button>
       </div>
       <div class="ob-foot">
         <button class="press ob-btn" data-act="obshare">Share invite link</button>
-        <button class="press ob-link" data-act="obaccept">Preview: <b>${esc(pn)} accepts</b></button>
+        ${a.partner.contact ? `<button class="press ob-link" data-act="obresendinv">Send on ${/@/.test(a.partner.contact) ? 'email' : 'WhatsApp'} again</button>` : ''}
         <button class="press ob-link" data-act="obskip" style="margin-top:0">Go to the app, <b>I'll wait</b></button>
       </div>
     </div>`;
@@ -1319,10 +1367,11 @@ function onboardView() {
     case 'join': return `<div class="ob">
       ${obBack(a && a.me ? 'invite' : 'welcome')}
       <div style="color:var(--accent)">${flower(72)}</div>
-      <h1 class="ob-h" style="margin-top:10px">Got an invite?</h1>
-      <p class="ob-p left">Enter the code they sent you. It looks like HUM-4F7K.</p>
+      <h1 class="ob-h" style="margin-top:10px">${OB.inviter && OB.inviter.name ? `${esc(OB.inviter.name)} invited you` : 'Got an invite?'}</h1>
+      <p class="ob-p left">${OB.inviter && OB.inviter.name ? `Join ${esc(OB.inviter.name)}'s little corner on humm..${OB.inviter.city ? ` in ${esc(OB.inviter.city)}` : ''}.` : 'Enter the code they sent you. It looks like HUM-4F7K.'}</p>
       <div class="ob-form">
         <label class="ob-field"><span>Invite code</span><input id="obCode" class="code-input" placeholder="HUM-____" value="${esc(f.code || '')}" autocomplete="off" maxlength="8"></label>
+        ${OB.inviter && OB.inviter.name ? '' : field('obPName', 'Who invited you?', 'text', 'their name', f.pname)}
         ${a && a.me ? '' : field('obName', 'Your name', 'text', 'what should they call you?', f.name, 'given-name') + field('obEmail', 'Email', 'email', 'you@example.com', f.email, 'email') + field('obPass', 'Password', 'password', 'at least 6 characters', f.pass, 'new-password')}
         ${err}
       </div>
@@ -1343,7 +1392,9 @@ function onboardView() {
       </div>
       <h1 class="ob-h" style="margin-top:18px">You're connected</h1>
       <p class="ob-p">${esc(ME.name)} & ${esc(P.name)}${km ? `<br><b class="km-big">${km}${/km$/.test(km) ? ' apart' : ''}</b>` : ''}<br>${esc(a.me.loc.city || 'you')} · ${esc(P.city)}</p>
-      <div class="ob-foot"><button class="press ob-btn" data-act="obdone">Start listening</button></div>
+      <div class="ob-foot">${a.partner && a.partner.joined && !OB.told
+        ? `<button class="press ob-btn" data-act="obtell">Tell ${esc(P.name)} you're in</button><button class="press ob-link" data-act="obdone">Skip for now</button>`
+        : `<button class="press ob-btn" data-act="obdone">Start listening</button>${a.partner && a.partner.joined ? `<button class="press ob-link" data-act="obtell">Send the link to ${esc(P.name)} again</button>` : ''}`}</div>
     </div>`;
     }
   }
@@ -1378,7 +1429,7 @@ function emptyHero() {
   return `<div class="px" style="margin-top:18px"><section class="inv-hero" aria-label="Add your first song">
     <div class="inv-pair" aria-hidden="true"><span class="pin a">${esc(ME.ini)}</span><span class="joined-heart" style="margin:0">${I.heart('currentColor', 14)}</span><span class="pin b">${esc(P.ini)}</span></div>
     <div class="inv-t">Your first song together</div>
-    <p class="inv-p">Add a song you both love. ${esc(P.name)} gets a ping when you play it.</p>
+    <p class="inv-p">Add a song you both love${simulate() ? `. ${esc(P.name)} gets a ping when you play it.` : ' and start your little library.'}</p>
     <div class="inv-actions"><button class="press ob-btn small" data-act="tab" data-tab="upload">Add a song</button></div>
   </section></div>`;
 }
@@ -1401,16 +1452,16 @@ function inviteSheet() {
   const body = pending ? `
       <div class="wait-pair" style="margin:4px auto 0" aria-hidden="true"><span class="pin a big">${esc(ME.ini)}</span><span class="wait-line"><i></i><i></i><i></i></span><span class="pin b big waiting">${esc(initials(a.partner.name))}</span></div>
       <div class="ob-h" style="text-align:center;font-size:26px;margin-top:14px">Waiting for ${esc(a.partner.name)}</div>
-      <p class="ob-p" style="text-align:center">They'll land in your little corner as soon as they accept.</p>
+      <p class="ob-p" style="text-align:center">When ${esc(a.partner.name)} joins, they'll send you a link back. Tap it and you're connected.</p>
       <div class="code-card" style="margin:18px auto 0;text-align:center">
         <div class="mono-label" style="font-family:'DM Mono',monospace!important">your invite code</div>
         <div class="code">${esc(a.partner.code)}</div>
-        <div class="code-link">humm.app/join/${esc(a.partner.code)}</div>
-        <button class="press ob-link" data-act="appcopy" style="margin-top:6px;min-height:32px"><b>Copy code</b></button>
+        <div class="code-link">${esc(shortLink(a.partner.code))}</div>
+        <button class="press ob-link" data-act="appcopy" style="margin-top:6px;min-height:32px"><b>Copy link</b></button>
       </div>
       <div class="inv-sheet-foot">
         <button class="press ob-btn" data-act="appshare">Share invite link</button>
-        <button class="press ob-link" data-act="appaccept">Preview: <b>${esc(a.partner.name)} accepts</b></button>
+        ${a.partner.contact ? `<button class="press ob-link" data-act="appresendinv">Send on ${/@/.test(a.partner.contact) ? 'email' : 'WhatsApp'} again</button>` : ''}
         <button class="press ob-link" data-act="appchange" style="margin-top:0">Invite someone else</button>
       </div>` : `
       <div style="color:var(--accent);display:flex;justify-content:center">${flower(64)}</div>
@@ -1440,7 +1491,7 @@ function appInvite() {
   if (!contact.trim()) { S.invErr = 'Add their phone or email so the invite reaches them'; return render(); }
   S.invErr = '';
   const a = acct.load(); a.partner = { name: name.trim(), contact: contact.trim(), code: inviteCode(), accepted: false }; a.solo = true; acct.save(a);
-  applyAccount(a); render(); flash(`Invite sent to ${name.trim()}`);
+  applyAccount(a); render(); sendInviteTo(a);
 }
 
 /* profile sheet (tap the avatars on Home) */
@@ -1502,6 +1553,7 @@ function obLogin() {
 function setMyLocation(loc) {
   OB.acc.me.loc = loc; acct.save(OB.acc); OB.locBusy = false;
   if (OB.relocating) { OB.relocating = false; OB.step = null; applyAccount(OB.acc); render(); flash(`Updated · you're ${P.km}${/km$/.test(P.km || '') ? ' apart' : ''}`); return; }
+  applyAccount(OB.acc);
   obGo(OB.acc.partner ? (OB.acc.partner.accepted ? 'connected' : 'waiting') : 'invite');
 }
 function obLocate() {
@@ -1518,8 +1570,8 @@ function obInvite() {
   if (!pname) return (OB.err = 'Who are you inviting?', render());
   if (!pcontact) return (OB.err = 'Add their phone or email so the invite reaches them', render());
   OB.acc.partner = { name: pname, contact: pcontact, code: inviteCode(), accepted: false }; acct.save(OB.acc);
+  sendInviteTo(OB.acc);
   obGo('waiting');
-  flash(`Invite sent to ${pname}`);
 }
 function obAccepted() {
   const p = OB.acc.partner;
@@ -1538,9 +1590,13 @@ function obJoin() {
     if (!name || !/^\S+@\S+\.\S+$/.test(email) || pass.length < 6) return (OB.err = 'Add your name, email and a 6+ character password', render());
     OB.acc = { me: { name, email } };
   }
-  // in the real app the code tells us who invited you; the prototype pairs you with Kabir in London
-  OB.acc.partner = { name: 'Kabir', contact: '', code, accepted: true, city: PARTNER_HOME.city, lat: PARTNER_HOME.lat, lon: PARTNER_HOME.lon, tz: PARTNER_HOME.tz };
-  acct.save(OB.acc);
+  const inv = OB.inviter && OB.inviter.code === code ? OB.inviter : null;
+  const pname = inv && inv.name ? inv.name : obVal('obPName');
+  if (!pname) { OB.form.pname = ''; return (OB.err = 'Who invited you?', render()); }
+  const saved = acct.load();
+  if (!saved || !saved.me || saved.me.email !== OB.acc.me.email) wipeLocalData();   // a new account on this phone starts empty
+  OB.acc.partner = { name: pname, contact: '', code, accepted: true, real: true, joined: true, city: inv ? inv.city : '', lat: inv ? inv.lat : null, lon: inv ? inv.lon : null, tz: inv ? inv.tz : '' };
+  OB.acc.solo = true; acct.save(OB.acc);
   if (!OB.acc.me.loc) { flash('Invite accepted. One more step'); return obGo('location'); }
   applyAccount(OB.acc); obGo('connected');
 }
@@ -1574,17 +1630,12 @@ function finishOnboarding(celebrate = true) {
   if (celebrate) freshStart();
   applyAccount(OB.acc); OB.step = null; S.tab = 'home'; S.overlay = null;
   render();
-  if (celebrate) flash(`${P.name} got a ping: ${ME.name} is here`);
+  if (celebrate && simulate()) flash(`${P.name} got a ping: ${ME.name} is here`);
   setTimeout(() => partnerStarts('s9'), celebrate ? 14000 : 6000);
 }
-async function obShare() {
-  const c = OB.acc.partner.code, url = `https://humm.app/join/${c}`;
-  const text = `Hum along with me on humm.. Code: ${c}`;
-  try { if (navigator.share) { await navigator.share({ title: 'humm..', text, url }); return; } } catch (e) { return; }
-  obCopy(`${text} ${url}`);
-}
+function obShare() { shareText(inviteText(OB.acc)); }
 async function obCopy(t) {
-  const txt = t || OB.acc.partner.code;
+  const txt = t || inviteLink(OB.acc);
   try { await navigator.clipboard.writeText(txt); flash('Copied'); } catch (e) { flash(txt); }
 }
 
@@ -2481,7 +2532,7 @@ function invite() {
   Object.assign(S, { session: 'waiting', overlay: 'session', playing: true, flipped: false, feed: [{ who: 'You', what: 'invited ' + P.name + ' to listen' }] });
   render();
   clearTimeout(inviteT);
-  inviteT = setTimeout(() => { if (S.session === 'waiting') { goLive(true); flash(`${P.name} joined`); } }, 3200);
+  if (simulate()) inviteT = setTimeout(() => { if (S.session === 'waiting') { goLive(true); flash(`${P.name} joined`); } }, 3200);
 }
 function leave() {
   clearTimeout(inviteT);
@@ -2526,7 +2577,7 @@ function sendNote() {
   if (S.notesOpen && app.querySelector('.notes-wrap')) { refreshNotes(document.activeElement && document.activeElement.id === 'noteIn'); flash(`Sent to ${P.name}`, true); }
   else flash(`Left on ${song(id).t} for ${P.name}`);
   clearTimeout(replyT);
-  replyT = setTimeout(() => {   // he writes back
+  if (simulate()) replyT = setTimeout(() => {   // he writes back
     const replies = ['smiling at my desk now', 'okay that made my day', 'come home soon', 'on repeat till you call', 'saving this one forever'];
     S.notes[id].push({ by: 'K', text: replies[Math.floor(Math.random() * replies.length)], when: 'just now', re: text });
     if (S.notesOpen && S.curId === id && app.querySelector('.notes-wrap')) { refreshNotes(document.activeElement && document.activeElement.id === 'noteIn'); flash(`${P.name} wrote back`, true); }
@@ -2537,9 +2588,9 @@ function sendNote() {
 function sendMsg() {
   const text = S.msgDraft.trim(); if (!text) { S.composing = false; render(); return; }
   S.messages.push({ by: 'A', text, when: 'just now' });
-  Object.assign(S, { msgDraft: '', composing: false, typing: true });
-  flash(`Sent to ${P.name}`);
-  setTimeout(() => {
+  Object.assign(S, { msgDraft: '', composing: false, typing: simulate() });
+  flash(simulate() ? `Sent to ${P.name}` : `Saved · ${P.name} sees notes once your phones sync`);
+  if (simulate()) setTimeout(() => {
     const back = ['haha okay you win', 'counting the days', 'call me after dinner?', 'you always know', 'sending one right back'];
     const t = back[Math.floor(Math.random() * back.length)];
     S.messages.push({ by: 'K', text: t, when: 'just now' });
@@ -2666,7 +2717,7 @@ app.addEventListener('focusout', () => setTimeout(() => {
   if (pendingRender && !(a && a.tagName === 'INPUT' && app.contains(a))) { pendingRender = false; render(); }
 }, 0));
 function partnerStarts(id) {   // Kabir starts a song on his phone → you get a notification
-  if (S.session || !paired()) return;
+  if (S.session || !paired() || !simulate()) return;
   if (!ALL.includes(id)) { if (!ALL.length) return; id = ALL[Math.floor(Math.random() * ALL.length)]; }
   S.partner = { status: 'listening', songId: id, prog: 0 };
   logHistory({ type: 'K', id, time: new Date().toLocaleTimeString('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true }) });
@@ -2785,7 +2836,7 @@ app.addEventListener('click', e => {
     case 'setstatus': S.status.A = { k: d.k, text: d.v, when: 'just now' }; flash(`${P.name} can see you're ${d.v}`); break;
     case 'thinking':
       S.thinking = true; flash(`${P.name}'s screen just glowed a little`);
-      setTimeout(() => { S.thinking = false; flash(`${P.name} is thinking of you too`); }, 3800);
+      setTimeout(() => { S.thinking = false; if (simulate()) flash(`${P.name} is thinking of you too`); else render(); }, 3800);
       break;
     case 'bannerjoin': S.banner = null; join(); break;
     case 'allnotes': S.showAll = true; render(); break;
@@ -2809,6 +2860,9 @@ app.addEventListener('click', e => {
     case 'objoin': obJoin(); break;
     case 'obdone': { const fromApp = OB.fromApp; OB.fromApp = false; finishOnboarding(!fromApp); if (fromApp) flash(`You and ${P.name} are connected`); break; }
     case 'obskip': obSkip(); break;
+    case 'obresendinv': sendInviteTo(OB.acc); break;
+    case 'appresendinv': sendInviteTo(acct.load()); break;
+    case 'obtell': shareText(acceptText(OB.acc)); OB.told = true; render(); break;
     case 'invitesheet': S.inviteSheet = true; S.profile = false; render(); break;
     case 'closeinvite': S.inviteSheet = false; render(); break;
     case 'appinvite': appInvite(); break;
