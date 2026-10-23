@@ -957,31 +957,36 @@ html,body{overflow:hidden;overscroll-behavior:none}
 .undo-bar.out{opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s}
 @keyframes toastUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-/* ===== launch splash ===== */
-#splash{position:fixed;inset:0;z-index:999;background:var(--accent);display:flex;align-items:center;justify-content:center;transition:opacity .42s ease,transform .42s ease}
+/* ===== launch splash =====
+   starts exactly like the phone's own launch screen (white, blue humm..), then floods with colour */
+#splash{position:fixed;inset:0;z-index:999;background:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .42s ease,transform .42s ease}
 #splash.out{opacity:0;transform:scale(1.04);pointer-events:none}
-.sp-inner{display:flex;flex-direction:column;align-items:center;transform:translateY(-4%)}
-.sp-buds{color:#fff;height:138px;opacity:0;transform:translateY(-70px)}
+.sp-fill{position:absolute;inset:0;background:var(--accent);clip-path:circle(0% at 50% 50%);display:flex;align-items:center;justify-content:center}
+.sp-fill .sp-logo{color:#fff}
+.sp-inner{position:relative;display:flex;flex-direction:column;align-items:center}
+.sp-logo{font-family:'Yellowtail','Pacifico',cursive;font-size:56px;line-height:1;color:var(--accent);display:flex;align-items:baseline}
+.sp-buds{position:absolute;bottom:calc(100% + 14px);left:50%;height:138px;margin-left:-46px;color:#fff;opacity:0;transform:translateY(-60px)}
 .sp-buds .buds{display:block;overflow:visible}
 #splash .buds{color:#fff!important}
 #splash .buds [fill="#fff"]{fill:var(--accent)}
-.sp-logo{margin-top:14px;font-family:'Yellowtail','Pacifico',cursive;font-size:56px;line-height:1;color:#fff;display:flex;align-items:baseline}
-.sp-word{display:inline-block;clip-path:inset(-20% 100% -30% 0)}
-.sp-dot{display:inline-block;opacity:0;transform:translateY(-14px) scale(.4)}
-.sp-tag{margin-top:12px;font-family:'Inter Tight','Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:lowercase;color:rgba(255,255,255,.78);opacity:0;transform:translateY(6px)}
-#splash.go .sp-buds{animation:spDrop .8s cubic-bezier(.3,1.4,.5,1) forwards}
-#splash.go .sp-word{animation:spWrite .75s cubic-bezier(.6,0,.3,1) .45s forwards}
-#splash.go .sp-dot{animation:spPop .45s cubic-bezier(.3,1.6,.5,1) forwards}
-#splash.go .sp-dot:nth-of-type(2){animation-delay:1.15s}
+.sp-tag{position:absolute;top:calc(100% + 12px);left:50%;transform:translate(-50%,6px);white-space:nowrap;font-family:'Inter Tight','Plus Jakarta Sans',system-ui,sans-serif;font-size:13px;font-weight:500;letter-spacing:.08em;color:rgba(255,255,255,.8);opacity:0}
+#splash.go .sp-fill{animation:spFlood .7s cubic-bezier(.65,0,.35,1) .15s forwards}
+#splash.go .sp-buds{animation:spDrop .8s cubic-bezier(.3,1.4,.5,1) .65s forwards}
+#splash.go .sp-dot{animation:spBob .5s ease-in-out 1.2s 2 alternate}
 #splash.go .sp-dot:nth-of-type(3){animation-delay:1.32s}
-#splash.go .sp-tag{animation:spFade .5s ease 1.45s forwards}
+#splash.go .sp-tag{animation:spTag .5s ease 1.3s forwards}
+@keyframes spFlood{to{clip-path:circle(75% at 50% 50%)}}
 @keyframes spDrop{to{opacity:1;transform:none}}
-@keyframes spWrite{to{clip-path:inset(-20% -5% -30% 0)}}
-@keyframes spPop{to{opacity:1;transform:none}}
-@keyframes spFade{to{opacity:1;transform:none}}
+@keyframes spBob{to{transform:translateY(-8px)}}
+@keyframes spTag{to{opacity:1;transform:translate(-50%,0)}}
+.sp-dot{display:inline-block}
 @media (prefers-reduced-motion:reduce){
-  .sp-buds,.sp-word,.sp-dot,.sp-tag{opacity:1!important;transform:none!important;clip-path:none!important;animation:none!important}
+  #splash.go .sp-fill{animation:none;clip-path:none}
+  #splash.go .sp-buds,#splash.go .sp-tag{animation:none;opacity:1;transform:translate(-50%,0)}
+  #splash.go .sp-buds{transform:none}
+  #splash.go .sp-dot{animation:none}
 }
+
 </style>
 <script>
 /* paint the splash in the saved colour before anything shows */
@@ -990,8 +995,10 @@ try { var T = { cobalt: '#2149E8', ink: '#22252E' }[localStorage.getItem('hum_th
 </head>
 <body>
 <div id="splash" aria-hidden="true">
-  <div class="sp-inner">
-    <div class="sp-buds"><svg class="buds" width="92" height="138" viewBox="0 0 100 150" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+  <div class="sp-inner"><div class="sp-logo"><span class="sp-word">humm</span><span class="sp-dot">.</span><span class="sp-dot">.</span></div></div>
+  <div class="sp-fill">
+    <div class="sp-inner">
+      <div class="sp-buds"><svg class="buds" width="92" height="138" viewBox="0 0 100 150" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
 <g class="sway sway-l">
   <path d="M38 0c1 14-3 24-4 36s5 22 3 34-6 18-4 30c1 6 2 10 2 14"/>
   <g transform="rotate(8 35 120)">
@@ -1011,16 +1018,17 @@ try { var T = { cobalt: '#2149E8', ink: '#22252E' }[localStorage.getItem('hum_th
   </g>
   </g>
 </svg></div>
-    <div class="sp-logo"><span class="sp-word">humm</span><span class="sp-dot">.</span><span class="sp-dot">.</span></div>
-    <div class="sp-tag">music for two</div>
+      <div class="sp-logo"><span class="sp-word">humm</span><span class="sp-dot">.</span><span class="sp-dot">.</span></div>
+      <div class="sp-tag">music for two</div>
+    </div>
   </div>
 </div>
 <script>
 (function () {
   var sp = document.getElementById('splash'), done = false;
-  var m0 = document.querySelector('meta[name="theme-color"]'); if (m0) m0.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2149E8');
+  var m0 = document.querySelector('meta[name="theme-color"]'); setTimeout(function () { if (m0 && !done) m0.setAttribute('content', getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2149E8'); }, 500);
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function go() { if (sp.classList.contains('go')) return; sp.classList.add('go'); setTimeout(hide, reduce ? 700 : 2100); }
+  function go() { if (sp.classList.contains('go')) return; sp.classList.add('go'); setTimeout(hide, reduce ? 700 : 2300); }
   function hide() { if (done) return; done = true; sp.classList.add('out'); var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', '#ffffff'); setTimeout(function () { sp.remove(); }, 450); }
   sp.addEventListener('click', hide);
   try { document.fonts.load('40px Yellowtail').then(go, go); } catch (e) { go(); }
