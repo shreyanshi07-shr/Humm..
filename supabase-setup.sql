@@ -28,6 +28,9 @@ create table if not exists public.couples (
   constraint couple_two_people check (b is null or a <> b)
 );
 create unique index if not exists couples_one_per_a on public.couples(a);
+-- what each of you calls the other: nick_a is a's name for b, nick_b is b's name for a
+alter table public.couples add column if not exists nick_a text check (char_length(nick_a) <= 40);
+alter table public.couples add column if not exists nick_b text check (char_length(nick_b) <= 40);
 create unique index if not exists couples_one_per_b on public.couples(b) where b is not null;
 
 create table if not exists public.songs (
@@ -222,6 +225,15 @@ begin
   return c;
 end $$;
 
+-- rename your person, just for you
+create or replace function public.set_nickname(nick text) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is null then raise exception 'not signed in'; end if;
+  update public.couples set nick_a = nullif(left(trim(nick), 40), '') where a = auth.uid();
+  update public.couples set nick_b = nullif(left(trim(nick), 40), '') where b = auth.uid();
+end $$;
+
 -- delete my account and everything that's only mine
 create or replace function public.delete_my_account() returns void
 language plpgsql security definer set search_path = public as $$
@@ -233,10 +245,10 @@ begin
     delete from public.songs where couple_id = c.id and added_by = me;
     if c.a = me and c.b is not null then
       update public.couples set a = c.b, b = null, invite_code = public.new_invite_code(),
-        invite_name = null, invite_contact = null where id = c.id;
+        invite_name = null, invite_contact = null, nick_a = null, nick_b = null where id = c.id;
     elsif c.b = me then
       update public.couples set b = null, invite_code = public.new_invite_code(),
-        invite_name = null, invite_contact = null where id = c.id;
+        invite_name = null, invite_contact = null, nick_a = null, nick_b = null where id = c.id;
     end if;
   end if;
   delete from auth.users where id = me;   -- profile, notes and a solo corner go with it
@@ -248,8 +260,32 @@ revoke all on function public.delete_my_account()  from public, anon;
 grant execute on function public.ensure_couple()      to authenticated;
 grant execute on function public.join_couple(text)    to authenticated;
 grant execute on function public.delete_my_account()  to authenticated;
+revoke all on function public.set_nickname(text) from public, anon;
+grant execute on function public.set_nickname(text) to authenticated;
 grant execute on function public.invite_info(text)    to anon, authenticated;
 revoke all on function public.new_invite_code() from public, anon, authenticated;
+
+-- ---------- phone notifications (web push): each phone that turned them on ----------
+create table if not exists public.push_subscriptions (
+  endpoint   text primary key,
+  owner      uuid not null default auth.uid() references auth.users(id) on delete cascade,
+  sub        jsonb not null,
+  created_at timestamptz not null default now()
+);
+alter table public.push_subscriptions enable row level security;
+drop policy if exists "push: mine" on public.push_subscriptions;
+create policy "push: mine" on public.push_subscriptions
+  for all to authenticated using (owner = auth.uid()) with check (owner = auth.uid());
+-- a phone that changes hands moves to whoever is signed in on it now
+create or replace function public.save_push(p_endpoint text, p_sub jsonb) returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if auth.uid() is null then raise exception 'not signed in'; end if;
+  insert into public.push_subscriptions(endpoint, owner, sub) values (p_endpoint, auth.uid(), p_sub)
+  on conflict (endpoint) do update set owner = auth.uid(), sub = excluded.sub, created_at = now();
+end $$;
+revoke all on function public.save_push(text, jsonb) from public, anon;
+grant execute on function public.save_push(text, jsonb) to authenticated;
 
 -- ---------- live updates ----------
 do $$ begin
