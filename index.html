@@ -641,6 +641,23 @@ button.pair-badge{cursor:pointer}
 .ses-react button{width:46px;height:40px;border-radius:999px;display:flex;align-items:center;justify-content:center}
 .ses-react button:hover{background:#fff}
 .ses-feed{font-size:12.5px;color:var(--muted);text-align:center;min-height:18px}
+.ses-foot{gap:8px!important;align-items:stretch!important}
+.ses-chat{display:flex;flex-direction:column;gap:5px;min-height:20px}
+.sc{display:flex}.sc.a{justify-content:flex-end}
+.sc span{max-width:78%;padding:7px 12px;border-radius:16px;font-family:'DM Mono',monospace;font-size:13px;line-height:1.4;background:#F2F3F6;color:#17181D;overflow-wrap:anywhere;animation:scIn .3s ease both}
+.sc.k span{border-bottom-left-radius:5px}
+.sc.a span{background:var(--accent-soft);border-bottom-right-radius:5px}
+.sc-hint{font-size:12.5px;color:var(--muted);text-align:center}
+.ses-row{display:flex;align-items:center;gap:8px}
+.ses-compose{flex:1;min-width:0;display:flex;align-items:center;gap:4px;height:48px;padding:0 4px 0 14px;border-radius:999px;background:#F5F5F7}
+.ses-compose input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-family:'DM Mono',monospace;font-size:14px;color:#17181D}
+.ses-compose input::placeholder{color:#A3A9B6}
+.ses-compose button{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#E3E4E9;color:#fff;transition:background .2s}
+.ses-compose button.on{background:var(--accent)}
+.ses-row .ses-react{flex-shrink:0;padding:4px;gap:0}
+.ses-row .ses-react button{width:36px;height:40px}
+@keyframes scIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (max-height:700px){.ses-chat .sc:nth-last-child(n+3){display:none}}
 .ses-feed b{color:var(--ink);font-weight:600}
 @media (max-height:700px){ .ses-head{margin-top:8px} .ses-progress{margin-top:10px} .ses-controls{margin-top:8px} .ses-foot{margin-top:10px} }
 
@@ -874,7 +891,7 @@ html,body{overflow:hidden;overscroll-behavior:none}
 /* keyboard open: give notes the room */
 .kb-open .note-sheet{max-height:calc(100% - 10px)!important}
 .kb-open .sheet-notes{min-height:40px}
-.toast.still{animation:none!important}
+.toast.still{animation:none!important;transform:translateX(-50%)}
 .no-anim,.no-anim *{animation-play-state:running}
 
 /* tighter top spacing */
@@ -1071,20 +1088,22 @@ html,body{overflow:hidden;overscroll-behavior:none}
 .prof-sheet{background:#F6F6F8!important;overflow-y:auto;scrollbar-width:none;padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
 .prof-head{display:flex;flex-direction:column;align-items:center}
 .prof-head .pin.a{background:#fff}
-.prof-names{margin-top:12px;font-family:'Fraunces','Georgia',serif;font-size:26px;font-weight:600;letter-spacing:-.01em;color:var(--ink);text-align:center}
+.prof-names{margin-top:10px;font-family:'Fraunces','Georgia',serif;font-size:24px;font-weight:600;letter-spacing:-.01em;color:var(--ink);text-align:center}
 .prof-names i{font-style:normal;color:var(--accent)}
-.prof-dist{margin-top:18px;padding:18px 16px 14px;border-radius:22px;background:#fff;text-align:center}
-.pd-km{font-family:'Fraunces','Georgia',serif;font-size:40px;font-weight:600;line-height:1;color:var(--accent);letter-spacing:-.02em}
-.pd-km span{font-size:18px}
-.pd-label{margin-top:6px;font-size:13px;color:var(--muted)}
-.pd-cities{display:grid;grid-template-columns:minmax(0,1fr) 64px minmax(0,1fr);align-items:center;gap:6px;margin-top:16px}
-.pd-city{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
-.pd-city .pin{width:34px;height:34px;font-size:14px}
+.prof-dist{margin-top:14px;padding:16px 14px 8px;border-radius:22px;background:#fff;text-align:center}
+.pd-km{font-family:'Fraunces','Georgia',serif;font-size:22px;font-weight:600;line-height:1;color:var(--accent);letter-spacing:-.01em;white-space:nowrap}
+.pd-km span{font-size:13px}
+.pd-label{margin-top:2px;font-size:11.5px;color:var(--muted)}
+.prof-dist.solo .pd-label{font-size:13px}
+.pd-cities{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:8px}
+.pd-city{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.pd-city .pin{width:32px;height:32px;font-size:13px}
 .pd-city b{font-size:14px;font-weight:700;color:var(--ink);max-width:100%}
-.pd-city small{font-size:12px;color:var(--muted)}
-.pd-line{width:64px;height:20px;color:var(--accent-dim);margin-bottom:28px}
-.pd-update{margin-top:14px;height:36px;padding:0 14px;border-radius:999px;background:var(--accent-tint);color:var(--accent);font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
-.pg-title{margin:22px 4px 8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A90A0}
+.pd-city small{font-size:11.5px;color:var(--muted)}
+.pd-mid{display:flex;flex-direction:column;align-items:center;min-width:84px}
+.pd-line{width:76px;height:12px;color:var(--accent-dim);margin:3px 0 0}
+.pd-update{margin-top:8px;height:30px;padding:0 10px;border-radius:999px;background:transparent;color:var(--accent);font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.pg-title{margin:18px 4px 8px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A90A0}
 .prof-sheet .theme-row{margin-top:0}
 .pg-hint{margin:8px 4px 0;font-size:12px;line-height:1.45;color:#8A90A0}
 .pg-card{border-radius:18px;background:#fff;overflow:hidden}
@@ -1151,7 +1170,7 @@ html,body{overflow:hidden;overscroll-behavior:none}
 .dlg-ico.soft{background:var(--accent-soft,#EEF2FF);color:var(--accent);animation:dlgIn .4s cubic-bezier(.2,1.2,.3,1) .1s both}
 .dlg-input{width:100%;height:50px;margin-top:16px;border-radius:14px;border:1.5px solid #E3E4E8;background:#F7F8FA;padding:0 16px;font:600 17px 'Inter Tight','Inter',sans-serif;color:var(--ink);text-align:center;outline:none;transition:border-color .15s,background .15s}
 .dlg-input:focus{border-color:var(--accent);background:#fff}
-.prof-rename{margin:10px auto 0;display:flex;align-items:center;gap:6px;height:32px;padding:0 14px;border-radius:999px;background:#F2F3F5;color:var(--muted);font-size:13px;font-weight:600;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prof-rename{margin:8px auto 0;display:flex;align-items:center;gap:6px;height:30px;padding:0 14px;border-radius:999px;background:#F2F3F5;color:var(--muted);font-size:13px;font-weight:600;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .upd-wrap{position:absolute;inset:0;z-index:80;display:flex;align-items:flex-end}
 .upd-backdrop{position:absolute;inset:0;background:rgba(15,17,24,.42)}
 .upd-sheet{position:relative;width:100%;background:#fff;border-radius:32px 32px 0 0;padding:22px 22px calc(22px + env(safe-area-inset-bottom));text-align:center;box-shadow:0 -20px 50px rgba(15,17,24,.18)}
@@ -1758,15 +1777,17 @@ function profileSheet() {
   const a = acct.load(); if (!a) return '';
   const chev = svg(16, '<path d="m9 6 6 6-6 6"/>');
   const myCity = a.me.loc && a.me.loc.city;
+  const kmNum = P.km ? P.km.replace(/[^0-9]/g, '') : '';
   const dist = paired() ? `<section class="prof-dist">
-      <div class="pd-km">${P.km ? `<b data-count="${esc(P.km.replace(/[^0-9]/g, ''))}">${OPENED.profile ? '0' : esc(P.km.replace(/ km$/, ''))}</b><span> km</span>` : '—'}</div>
-      <div class="pd-label">${P.km ? 'between you right now' : 'share locations to see the distance'}</div>
       <div class="pd-cities">
-        <div class="pd-city"><span class="pin a">${esc(ME.ini)}</span><b class="ell">${esc(myCity || 'You')}</b><small>${nowTime(myTz() || 'Asia/Kolkata')}</small></div>
-        <svg class="pd-line" viewBox="0 0 80 20" preserveAspectRatio="none" aria-hidden="true"><path d="M2 14 Q40 -4 78 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 4" stroke-linecap="round"/></svg>
-        <div class="pd-city"><span class="pin b">${esc(P.ini)}</span><b class="ell">${esc(P.city || P.name)}</b><small>${P.city ? nowTime(P.tz) : ''}</small></div>
+        <div class="pd-city"><b class="ell">${esc(myCity || 'You')}</b><small>${nowTime(myTz() || 'Asia/Kolkata')}</small></div>
+        <div class="pd-mid">
+          <div class="pd-km">${P.km ? (kmNum ? `<b data-count="${esc(kmNum)}">${OPENED.profile ? '0' : esc(P.km.replace(/ km$/, ''))}</b><span> km</span>` : '<b>0</b><span> km</span>') : '—'}</div>
+          <svg class="pd-line" viewBox="0 0 80 20" preserveAspectRatio="none" aria-hidden="true"><path d="M2 14 Q40 -4 78 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3 4" stroke-linecap="round"/></svg>
+        </div>
+        <div class="pd-city"><b class="ell">${esc(P.city || P.name)}</b><small>${P.city ? nowTime(P.tz) : ''}</small></div>
       </div>
-      <button class="press pd-update" data-act="relocate">${svg(14, '<path d="M12 21s-6.5-6.2-6.5-11A6.5 6.5 0 0 1 18.5 10c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>')} Update my location</button>
+      <button class="press pd-update" data-act="relocate">Update my location</button>
     </section>`
     : `<section class="prof-dist solo">
       <div class="pd-label" style="margin:0">${PAIR.state === 'pending' ? 'Invite sent to ' + esc(PAIR.name) + '. Waiting for them to join' : 'humm.. is better with your person'}</div>
@@ -1784,7 +1805,6 @@ function profileSheet() {
       ${dist}
       <div class="pg-title">Theme</div>
       <div class="theme-row" role="group" aria-label="App theme">${themeSwatches()}</div>
-      <div class="pg-hint">Changes the colour of buttons, highlights and the splash screen.</div>
       <div class="pg-title">Account</div>
       <div class="pg-card">
         <div class="pg-row static"><span>Signed in as</span><b class="ell">${esc(a.me.email || '')}</b></div>
@@ -2710,6 +2730,27 @@ function fitAll() {
 }
 window.addEventListener('resize', fitAll);
 
+/* the last few little notes, so you can talk while you listen */
+function sesChat() {
+  const key = m => (m.at && Date.parse(m.at)) || 0;
+  const msgs = S.messages.slice().sort((a, b) => key(a) - key(b)).slice(-3);
+  if (!msgs.length) return `<div class="sc-hint">${S.session === 'live' ? 'you can both play, pause and skip · say hi below' : `we'll start in sync the moment ${esc(P.name)} joins`}</div>`;
+  return msgs.map(m => `<div class="sc ${m.by === 'K' ? 'k' : 'a'}"><span>${esc(m.text)}</span></div>`).join('');
+}
+function refreshSes(focus) {
+  const box = app.querySelector('.overlay.ses .ses-chat'); if (!box) return false;
+  box.innerHTML = sesChat();
+  const inp = app.querySelector('#sesIn');
+  if (inp) { if (inp.value !== (S.sesDraft || '')) inp.value = S.sesDraft || ''; const b = app.querySelector('.ses-compose button'); if (b) b.classList.toggle('on', !!(S.sesDraft || '').trim()); if (focus) inp.focus({ preventScroll: true }); }
+  return true;
+}
+function sendSes() {
+  const text = (S.sesDraft || '').trim(); if (!text) return;
+  S.sesDraft = '';
+  const typing = document.activeElement && document.activeElement.id === 'sesIn';
+  postNote(text, null, null).then(ok => { if (!ok) S.sesDraft = text; refreshSes(typing); });
+  refreshSes(typing);
+}
 function session(anim) {
   const s = song(S.curId), live = S.session === 'live';
   const acc = acct.load(), myCity = acc && acc.me && acc.me.loc && acc.me.loc.city;
@@ -2752,12 +2793,19 @@ function session(anim) {
     </div>
 
     <div class="ses-foot">
+      <div class="ses-chat">${sesChat()}</div>
+      <div class="ses-row">
+      <div class="ses-compose">
+        <label for="sesIn" class="sr-only">Write to ${esc(P.name)}</label>
+        <input id="sesIn" placeholder="say something…" value="${esc(S.sesDraft || '')}" autocomplete="off" maxlength="500" enterkeyhint="send">
+        <button class="press ${(S.sesDraft || '').trim() ? 'on' : ''}" data-act="sendses" aria-label="Send">${icoSend}</button>
+      </div>
       <div class="ses-react" role="group" aria-label="Send ${esc(P.name)} a reaction">
         <button class="press" data-act="react" data-k="heart" aria-label="Send a heart" style="color:#E04A6A">${I.heart('currentColor', 18)}</button>
         <button class="press" data-act="react" data-k="fire" aria-label="Send fire" style="color:#E0611A">${I.fire(18)}</button>
         <button class="press" data-act="react" data-k="star" aria-label="Send a star" style="color:var(--accent)">${I.star(18)}</button>
       </div>
-      <div class="ses-feed">${lastFeed ? `<b>${esc(lastFeed.who)}</b> ${esc(lastFeed.what)}` : (live ? 'you can both play, pause and skip' : `we'll start in sync the moment ${esc(P.name)} joins`)}</div>
+      </div>
     </div>
   </div>`;
 }
@@ -2844,7 +2892,7 @@ function play(id, queue, ctx) {
   else {
     if (!(S.history[0] && S.history[0].type === 'A' && S.history[0].id === id)) logHistory({ type: 'A', id });
     S.notesOpen = false; S.replyTo = null;
-    if (paired()) flash(`${P.name} got a ping: you're listening to ${song(id).t}`); else render();
+    if (paired() && simulate()) flash(`${P.name} got a ping: you're listening to ${song(id).t}`); else render();
     return;
   }
   render();
@@ -2881,7 +2929,8 @@ function leave() {
   if (wasLive) logHistory({ type: 'together', id: S.curId, mins: Math.max(1, Math.round((Date.now() - S.sessionStart) / 60000)) });
   S.partner = { status: 'listening', songId: S.curId, prog: S.progress };
   Object.assign(S, { session: null, overlay: null });
-  flash(wasLive ? `Session ended · you're listening on your own` : 'Invite cancelled');
+  if (wasLive && !simulate()) { S.playing = false; try { audio.pause(); } catch (e) {} }   // leaving stops it for you; your person keeps listening
+  flash(wasLive ? (simulate() ? `Session ended · you're listening on your own` : `You left · ${P.name} is still listening`) : 'Invite cancelled');
 }
 function react(kind) {
   const stage = app.querySelector('#stage'); if (!stage) return;
@@ -3228,6 +3277,7 @@ app.addEventListener('click', e => {
     case 'doupdate': applyUpdate(); break;
     case 'laterupdate': S.updateReady = false; render(); break;
     case 'sendall': sendAll(); break;
+    case 'sendses': sendSes(); break;
     case 'delbackdrop': if (!S.deleting) { S.confirmDelete = false; render(); } break;
     case 'deleteacctno': S.confirmDelete = false; render(); break;
     case 'deleteacctyes': deleteAccount(); break;
@@ -3265,6 +3315,7 @@ app.addEventListener('input', e => {
   if (id === 'msgIn') S.msgDraft = v;
   if (id === 'allIn') { S.allDraft = v; const b = app.querySelector('.lt-compose button'); if (b) b.classList.toggle('on', !!v.trim()); }
   if (id === 'nickIn') S.nickDraft = v;
+  if (id === 'sesIn') { S.sesDraft = v; const b = app.querySelector('.ses-compose button'); if (b) b.classList.toggle('on', !!v.trim()); }
   if (S.up && id === 'upT') S.up.t = v;
   if (S.up && id === 'upA') S.up.a = v;
   if (S.up && id === 'upN') S.up.note = v;
@@ -3319,6 +3370,7 @@ app.addEventListener('keydown', e => {
   if (e.target.id === 'noteIn') { e.preventDefault(); sendNote(); }
   if (e.target.id === 'msgIn') { e.preventDefault(); sendMsg(); }
   if (e.target.id === 'allIn') { e.preventDefault(); sendAll(); }
+  if (e.target.id === 'sesIn') { e.preventDefault(); sendSes(); }
   if (e.target.id === 'nickIn') { e.preventDefault(); saveNickname(); }
   if (e.target.id === 'plName') { e.preventDefault(); plAction('plsave', {}); }
 });
@@ -3613,7 +3665,7 @@ function syncAcct() {
   const me = CLOUD.me || {}, c = CLOUD.couple || {}, p = CLOUD.partner;
   const a = { me: { id: me.id, name: me.name || '', email: CLOUD.user && CLOUD.user.email, loc: me.lat != null ? { lat: me.lat, lon: me.lon, city: me.city || '' } : null }, solo: true };
   const nick = c.a && c.a === me.id ? (c.nick_a || c.invite_name) : c.nick_b;   // what YOU call them wins over their own name
-  if (p) a.partner = { name: (nick && nick.trim()) || p.name || 'your person', own: p.name || '', nick: nick || '', accepted: true, real: true, city: p.city || '', lat: p.lat, lon: p.lon, tz: p.tz || '', code: c.invite_code };
+  if (p) a.partner = { name: (nick && nick.trim()) || p.name || 'your person', own: p.name || '', nick: nick || '', accepted: true, real: !(CLOUD.sb && CLOUD.sb.demo), city: p.city || '', lat: p.lat, lon: p.lon, tz: p.tz || '', code: c.invite_code };
   else if (c.invite_name) a.partner = { name: c.invite_name, contact: c.invite_contact || '', code: c.invite_code, accepted: false };
   a.code = c.invite_code;
   acct.save(a); OB.acc = a; applyAccount(a);
@@ -3804,6 +3856,7 @@ function onNoteChange(p) {
     const id = p.old && p.old.id; if (!id) return;
     S.messages = S.messages.filter(x => x.id !== id); Object.keys(S.notes).forEach(k => S.notes[k] = S.notes[k].filter(x => x.id !== id));
     if (S.showAll && refreshAll(document.activeElement && document.activeElement.id === 'allIn')) return;
+    if (S.overlay === 'session' && refreshSes(document.activeElement && document.activeElement.id === 'sesIn')) return;
     softRender(); return;
   }
   if (p.eventType !== 'INSERT') return;
@@ -3811,6 +3864,7 @@ function onNoteChange(p) {
   addNoteRow(r);
   if (r.song_id && S.notesOpen && S.curId === r.song_id && app.querySelector('.notes-wrap')) { refreshNotes(document.activeElement && document.activeElement.id === 'noteIn'); flash(`${P.name} wrote back`, true); }
   else if (S.showAll && refreshAll(document.activeElement && document.activeElement.id === 'allIn')) { /* it just appears in the list */ }
+  else if (!r.song_id && S.overlay === 'session' && refreshSes(document.activeElement && document.activeElement.id === 'sesIn')) { /* it appears in the chat */ }
   else { flash(r.song_id ? `${P.name} left a note on ${song(r.song_id).t}` : `A little note from ${P.name}`); }
   if (document.hidden) phoneNotify(r.song_id ? `${P.name} wrote on ${song(r.song_id).t}` : `A little note from ${P.name}`, r.body, 'note');
 }
@@ -3882,7 +3936,14 @@ function onSessionMsg(m) {
     if (document.hidden) phoneNotify(`${P.name} wants to listen together`, song(m.song_id).t + ' · tap to join', 'join');
     clearTimeout(bannerT); bannerT = setTimeout(() => { S.banner = null; softRender(); }, 20000);
   } else if (m.type === 'join') {
-    if (S.session === 'waiting') { goLive(true); flash(`${P.name} joined`); bcast('session', { type: 'sync', song_id: S.curId, pos: S.progress, playing: !!S.playing, at: Date.now() }); }
+    if (S.session === 'live') return;
+    if (!S.curId) return;
+    clearTimeout(inviteT); S.banner = null;
+    S.feed = [{ who: P.name, what: 'joined you' }];
+    goLive(true); S.overlay = 'session'; render();             // your screen switches to Together too
+    flash(`${P.name} joined you`, true);
+    if (document.hidden) phoneNotify(`${P.name} joined you`, `You're listening to ${song(S.curId).t} together`, 'msg');
+    bcast('session', { type: 'sync', song_id: S.curId, pos: S.progress, playing: !!S.playing, at: Date.now() });
   } else if (m.type === 'sync') {
     if (S.session !== 'live' || !ALL.includes(m.song_id)) return;
     applyingRemote = true;
@@ -3893,7 +3954,14 @@ function onSessionMsg(m) {
     render(); syncAudio();
     setTimeout(() => { applyingRemote = false; }, 600);
   } else if (m.type === 'leave') {
-    if (S.session) { Object.assign(S, { session: null }); if (S.overlay === 'session') S.overlay = null; flash(`${P.name} left the session`); }
+    if (!S.session) return;
+    const wasLive = S.session === 'live';
+    if (wasLive) logHistory({ type: 'together', id: S.curId, mins: Math.max(1, Math.round((Date.now() - S.sessionStart) / 60000)) });
+    S.partner = { status: 'idle', songId: S.curId, prog: 0, online: true };
+    Object.assign(S, { session: null, overlay: S.overlay === 'session' ? 'player' : S.overlay });   // you keep listening on your own
+    render();
+    flash(wasLive ? `${P.name} left · you're listening on your own` : `${P.name} said not now`);
+    if (document.hidden) phoneNotify(`${P.name} left`, `You're still listening to ${song(S.curId).t}`, 'msg');
   }
 }
 /* ---------- app updates: notice a new version on the server and offer a one-tap update ----------
