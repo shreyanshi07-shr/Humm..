@@ -1201,6 +1201,7 @@ html,body{overflow:hidden;overscroll-behavior:none}
 @keyframes udTwinkle{0%,100%{opacity:.25;transform:scale(.6)}50%{opacity:1;transform:scale(1.1)}}
 @keyframes udSwish{0%,100%{opacity:.2}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.upd-wrap *{animation:none!important}}
+.pg-val.muted{color:var(--muted);font-weight:500;font-size:13px}
 .pg-val{font-weight:600;color:var(--accent);font-size:14px}
 .prof-rename svg{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .lt-compose{display:flex;align-items:center;gap:8px;margin:0 14px;padding:8px 6px calc(10px + env(safe-area-inset-bottom)) 16px;border-top:1px dashed #E3E0D6;background:#fff}
@@ -1809,6 +1810,7 @@ function profileSheet() {
       <div class="pg-card">
         <div class="pg-row static"><span>Signed in as</span><b class="ell">${esc(a.me.email || '')}</b></div>
         ${canNotify() ? `<button class="press pg-row" data-act="asknotify"><span>Phone notifications</span><b class="pg-val">${Notification.permission === 'granted' ? 'On' : Notification.permission === 'denied' ? 'Blocked' : 'Turn on'}</b></button>` : ''}
+        <button class="press pg-row" data-act="checkupdate"><span>Check for updates</span><b class="pg-val muted">${typeof buildLabel === 'function' ? buildLabel() : ''}</b></button>
         <button class="press pg-row" data-act="signout"><span>Sign out</span>${chev}</button>
         <button class="press pg-row danger" data-act="deleteacct"><span>Delete account</span>${chev}</button>
       </div>
@@ -3275,6 +3277,7 @@ app.addEventListener('click', e => {
     case 'renameno': S.renameOpen = false; S.nickDraft = null; render(); break;
     case 'renamesave': saveNickname(); break;
     case 'doupdate': applyUpdate(); break;
+    case 'checkupdate': checkForUpdate(true); break;
     case 'laterupdate': S.updateReady = false; render(); break;
     case 'sendall': sendAll(); break;
     case 'sendses': sendSes(); break;
@@ -3967,22 +3970,31 @@ function onSessionMsg(m) {
 /* ---------- app updates: notice a new version on the server and offer a one-tap update ----------
    No version numbers to remember: we compare the app file on the server with the one that's running. */
 const UPD = { base: null, busy: false, seen: null };
+var BUILD = '2026-10-25T16:04:47+05:30';   // stamped every time a new version is made
+function buildLabel() { return (() => { const d = new Date(BUILD); return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }); })(); }
 async function appFingerprint() {
   const r = await fetch(location.pathname + '?u=' + Date.now(), { cache: 'no-store' });
   if (!r.ok) throw new Error('offline');
   const t = await r.text();
+  const b = t.match(/var BUILD = '([^']+)'/);
+  if (b && b[1] !== BUILD && b[1] !== '__BUILD__') return 'build:' + b[1];   // the server has a newer version than the one running
   if (window.crypto && crypto.subtle) { const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(h)].slice(0, 12).map(b => b.toString(16).padStart(2, '0')).join(''); }
   return t.length + ':' + t.slice(-400);
 }
-async function checkForUpdate() {
-  if (!/^https?:$/.test(location.protocol) || UPD.busy || S.updateReady || !navigator.onLine) return;
-  UPD.busy = true;
+async function checkForUpdate(byHand) {
+  if (!/^https?:$/.test(location.protocol)) { if (byHand) flash('Open humm.. from its web link to check for updates'); return; }
+  if (UPD.busy || S.updateReady) return;
+  if (!navigator.onLine) { if (byHand) flash('You’re offline. Try again when you’re connected'); return; }
+  UPD.busy = true; let found = false;
   try {
     if ('serviceWorker' in navigator) { const reg = await navigator.serviceWorker.getRegistration(); if (reg) reg.update().catch(() => {}); }
     const fp = await appFingerprint();
-    if (!UPD.base) UPD.base = fp;
-    else if (fp !== UPD.base && fp !== UPD.seen) { UPD.seen = fp; S.updateReady = true; softRender(); }
-  } catch (e) {}
+    if (fp.startsWith('build:') && fp !== UPD.seen) found = true;
+    else if (!UPD.base) UPD.base = fp;
+    else if (fp !== UPD.base && fp !== UPD.seen) found = true;
+    if (found) { UPD.seen = fp; S.updateReady = true; S.profile = false; softRender(); }
+    else if (byHand) flash('You’re on the latest version');
+  } catch (e) { if (byHand) flash('Couldn’t check right now. Try again in a moment'); }
   UPD.busy = false;
 }
 /* a hand-drawn phone with a song floating out of it (original doodle, drawn in humm..'s pen style) */
