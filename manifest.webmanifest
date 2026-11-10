@@ -2,9 +2,9 @@
   "name": "humm.. · music for two",
   "short_name": "humm..",
   "description": "Listen together, leave little notes, and always know how far apart you are.",
-  "id": "./",
+  "id": "/",
   "start_url": "./",
-  "scope": "./",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#ffffff",
@@ -49,5 +49,12 @@
         }
       ]
     }
+  },
+  "handle_links": "preferred",
+  "launch_handler": {
+    "client_mode": [
+      "navigate-existing",
+      "auto"
+    ]
   }
 }

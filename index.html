@@ -1201,6 +1201,125 @@ html,body{overflow:hidden;overscroll-behavior:none}
 @keyframes udTwinkle{0%,100%{opacity:.25;transform:scale(.6)}50%{opacity:1;transform:scale(1.1)}}
 @keyframes udSwish{0%,100%{opacity:.2}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.upd-wrap *{animation:none!important}}
+/* ---------- Draw & guess ---------- */
+.g-card{width:100%;display:flex;align-items:center;gap:14px;padding:14px 14px 14px 16px;border-radius:22px;background:#F3F3F6;color:var(--ink)}
+.g-card b{display:block;font-size:16px;font-weight:700}
+.g-card small{display:block;margin-top:2px;font-size:12.5px;color:var(--muted)}
+.g-card-art{width:48px;height:48px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;color:#17181D;flex-shrink:0}
+.g-card-go{height:34px;padding:0 16px;border-radius:999px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;flex-shrink:0}
+.g-scrib{stroke:var(--accent);stroke-dasharray:60;stroke-dashoffset:60;animation:gScrib 2.4s ease-in-out infinite}
+@keyframes gScrib{0%{stroke-dashoffset:60}55%,80%{stroke-dashoffset:0}100%{stroke-dashoffset:-60}}
+.overlay.g-ov{z-index:45;background:#fff!important;display:flex;flex-direction:column;padding:calc(12px + env(safe-area-inset-top)) 16px calc(12px + env(safe-area-inset-bottom));overflow:hidden}
+.g-top{display:grid;grid-template-columns:44px 1fr auto;align-items:center;color:var(--ink);min-height:44px}
+.g-round{justify-self:center;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)}
+.g-score{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);padding-right:4px}
+.g-score b{color:var(--ink);font-weight:700}.g-score i{font-style:normal;color:#C5CAD6}
+.g-lobby{flex:1;overflow-y:auto;text-align:center;padding:4px 6px 12px;scrollbar-width:none}
+.g-hero{color:#17181D;display:flex;justify-content:center;margin-top:6px}
+.g-h{margin:8px 0 0;font-family:'Fraunces','Georgia',serif;font-weight:600;font-size:28px;letter-spacing:-.01em;color:var(--ink)}
+.g-sub{margin:6px auto 0;max-width:290px;font-size:14px;line-height:1.5;color:var(--muted)}
+.g-label{margin:20px 2px 10px;text-align:left;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A90A0}
+.g-cats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.g-cat{min-height:46px;padding:8px 12px;border-radius:14px;background:#F3F3F6;color:var(--ink);font-size:14px;font-weight:600;text-align:left;border:1.5px solid transparent;transition:background .15s,border-color .15s}
+.g-cat.on{background:#fff;border-color:var(--accent);color:var(--accent)}
+.g-cat[disabled]{opacity:.55}
+.g-foot{display:flex;flex-direction:column;gap:6px;padding-top:10px}
+.g-go{width:100%;display:flex;align-items:center;justify-content:center;height:54px;border-radius:16px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;box-shadow:0 10px 24px var(--accent-shadow)}
+.g-ghost{width:100%;display:flex;align-items:center;justify-content:center;height:44px;border-radius:14px;color:var(--muted);font-size:14px;font-weight:600}
+.g-wait{display:flex;align-items:center;justify-content:center;gap:10px;height:54px;border-radius:16px;background:#F3F3F6;font-size:14px;font-weight:600;color:var(--ink)}
+.g-dots{display:inline-flex;gap:4px}.g-dots i{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:gDot 1.2s ease-in-out infinite}
+.g-dots i:nth-child(2){animation-delay:.15s}.g-dots i:nth-child(3){animation-delay:.3s}
+@keyframes gDot{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-4px);opacity:1}}
+.g-word{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;margin:6px 2px 10px}
+.g-cat-tag{grid-column:1;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent-dim,#8A90A0)}
+.g-word-t{grid-column:1;font-size:17px;font-weight:600;color:var(--ink);min-height:24px}
+.g-word-t b{font-family:'Fraunces','Georgia',serif;font-size:21px;color:var(--accent)}
+.g-mask{font-family:'DM Mono',monospace;font-size:20px;letter-spacing:.32em;color:var(--ink);white-space:pre-wrap}
+.g-len{margin-left:6px;font-family:Inter,sans-serif;font-size:12px;color:var(--muted);letter-spacing:0}
+.g-clock{grid-column:2;grid-row:1/3;min-width:52px;height:52px;border-radius:50%;border:2px solid #ECEDF1;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:var(--ink)}
+.g-clock.low{border-color:#E04A6A;color:#E04A6A;animation:beat 1s ease-in-out infinite}
+.g-board{position:relative;width:100%;max-height:52vh;aspect-ratio:1;margin:0 auto;border-radius:22px;background:#fff;border:1.5px solid #ECEDF1;overflow:hidden;flex-shrink:0}
+#gCanvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+#gCanvas.can-draw{cursor:crosshair}
+.g-choose{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:22px;background:rgba(255,255,255,.94)}
+.g-opt{min-height:56px;border-radius:16px;background:#F3F3F6;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;animation:gIn .35s ease both}
+.g-opt:nth-child(2){animation-delay:.06s}.g-opt:nth-child(3){animation-delay:.12s}
+.g-opt b{font-size:17px;font-weight:700;text-transform:capitalize}.g-opt small{font-size:11.5px;color:var(--muted)}
+.g-waitart{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#17181D}
+.g-reveal{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.7)}
+.g-rv-card{background:#fff;border-radius:22px;padding:18px 22px;text-align:center;box-shadow:0 18px 40px rgba(22,28,60,.16);animation:dlgIn .4s cubic-bezier(.2,1.2,.3,1) both}
+.g-rv-h{font-size:14px;font-weight:700;color:var(--muted)}
+.g-rv-w{margin-top:4px;font-family:'Fraunces','Georgia',serif;font-size:28px;font-weight:600;color:var(--accent);text-transform:capitalize}
+.g-rv-pts{margin-top:6px;font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)}
+@keyframes gIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.g-tools{display:flex;align-items:center;gap:6px;margin-top:10px;padding:6px;border-radius:999px;background:#F5F5F7;align-self:center}
+.g-sw{width:26px;height:26px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #E3E4E9;transition:transform .15s}
+.g-sw.on{transform:scale(1.15);box-shadow:0 0 0 2px var(--ink)}
+.g-sep{width:1px;height:20px;background:#E3E4E9;margin:0 2px}
+.g-tool{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.g-tool.on{background:#fff;box-shadow:0 2px 6px rgba(20,20,30,.12)}
+.g-tool i{display:block;border-radius:50%;background:var(--ink)}
+.g-feed{flex:1;min-height:40px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-top:10px;padding:0 4px;scrollbar-width:none}
+.g-feed-empty{margin:auto;font-size:12.5px;color:var(--muted)}
+.g-guess{font-family:'DM Mono',monospace;font-size:13px;color:#3D3F4A}
+.g-guess b{font-family:Inter,sans-serif;font-weight:600;color:var(--muted);margin-right:4px}
+.g-guess.close{color:#C77A12}.g-guess.ok{color:#1E7A4D;font-weight:600}
+.g-in{display:flex;align-items:center;gap:4px;height:50px;margin-top:8px;padding:0 4px 0 16px;border-radius:999px;background:#F5F5F7}
+.g-in input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-family:'DM Mono',monospace;font-size:15px;color:#17181D}
+.g-in button{width:42px;height:42px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center}
+.g-final{display:flex;justify-content:center;gap:12px;margin-top:18px}
+.g-final div{min-width:120px;padding:14px;border-radius:18px;background:#F3F3F6;display:flex;flex-direction:column;gap:4px}
+.g-final span{font-size:13px;color:var(--muted)}.g-final b{font-family:'Fraunces','Georgia',serif;font-size:30px;color:var(--ink)}
+.g-inv .g-inv-ico{width:42px;height:42px;border-radius:12px;background:#F3F3F6;display:flex;align-items:center;justify-content:center;color:#17181D;flex-shrink:0}
+@media (prefers-reduced-motion:reduce){.g-scrib,.g-dots i,.g-clock.low,.g-opt,.g-rv-card{animation:none!important}.g-scrib{stroke-dashoffset:0}}
+/* ---------- YouTube together (test) ---------- */
+.ytt-beta{font-style:normal;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:#E0302B;background:#FDECEC;border-radius:6px;padding:2px 5px;margin-left:4px;vertical-align:2px}
+.ytt-beta.big{justify-self:end;margin-right:6px}
+.overlay.ytt{z-index:44;background:#fff!important;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 0 0;overflow:hidden}
+.ytt-top{display:grid;grid-template-columns:44px 1fr auto;align-items:center;padding:0 10px;color:var(--ink)}
+.ytt-status{justify-self:center;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--muted)}
+.ytt-status .dot{width:7px;height:7px;border-radius:50%;background:#C5CAD6}
+.ytt-status.live{color:#1E7A4D}.ytt-status.live .dot{background:#2EAA6E;animation:pulse 1.8s ease-out infinite}
+.ytt-stage{position:relative;margin:10px 16px 0}
+.ytt-slot{width:100%;aspect-ratio:16/9;min-height:200px;border-radius:18px;background:#0E0F12;overflow:hidden}
+.ytt-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#9AA0AE;font-size:13px;text-align:center;padding:0 30px}
+.ytt-empty svg{width:34px;height:34px;color:#E0302B}
+.ytt-tap{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;white-space:nowrap;height:50px;padding:0 20px;border-radius:999px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;align-items:center;gap:8px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+#yttHost{position:fixed;z-index:46;overflow:hidden;background:#000}
+#yttHost.slot{border-radius:18px}
+#yttHost.pip{z-index:40;border-radius:16px;box-shadow:0 14px 34px rgba(15,17,24,.35);overflow:visible}
+#yttHost.off{pointer-events:none;opacity:0}
+#yttHost iframe,#yttFrame{width:100%;height:100%;display:block;border:0;border-radius:inherit}
+.ytt-expand{display:none}
+#yttHost.need-tap:not(.off) .ytt-tap{display:flex}
+#yttHost.pip .ytt-expand{display:block;position:absolute;left:0;right:0;bottom:100%;margin-bottom:6px;height:28px;border-radius:999px;background:var(--ink);color:#fff;font-size:12px;font-weight:600}
+.ytt-now{padding:12px 20px 0;text-align:center}
+.ytt-t{font-family:'Fraunces','Georgia',serif;font-weight:600;font-size:20px;color:var(--ink)}
+.ytt-a{margin-top:2px;font-size:13.5px;color:var(--muted)}
+#yttSeek{-webkit-appearance:none;appearance:none;width:100%;height:4px;margin:14px 0 0;border-radius:2px;background:linear-gradient(to right,var(--accent) var(--p,0%),#ECEDF1 var(--p,0%));outline:none}
+#yttSeek::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.2)}
+#yttSeek::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--accent)}
+.ytt-times{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--muted)}
+.ytt-ctl{display:flex;align-items:center;justify-content:center;gap:26px;margin-top:6px}
+.ytt-ctl button[disabled]{opacity:.35}
+.ytt-scroll{flex:1;overflow-y:auto;margin-top:10px;padding:0 16px calc(20px + env(safe-area-inset-bottom));border-top:1px solid #F0F0F3;scrollbar-width:none}
+.ytt-search{display:flex;align-items:center;gap:8px;height:48px;margin-top:14px;padding:0 6px 0 14px;border-radius:999px;background:#F3F3F6;color:#8A90A0}
+.ytt-search input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-size:15px;color:var(--ink)}
+.ytt-search button{height:36px;min-width:46px;padding:0 12px;border-radius:999px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ytt-msg{margin:12px 4px 0;font-size:13px;line-height:1.5;color:var(--muted)}
+.ytt-h{display:flex;align-items:center;gap:8px;margin:18px 4px 6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A90A0}
+.ytt-h span{font-weight:600;letter-spacing:0}
+.ytt-h button{margin-left:auto;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent)}
+.ytt-row{display:flex;align-items:center;gap:4px;padding:6px 0;border-radius:14px}
+.ytt-row.on .ytt-tx b{color:var(--accent)}
+.ytt-row-main{flex:1;min-width:0;display:flex;align-items:center;gap:12px;text-align:left}
+.ytt-th{width:72px;height:41px;border-radius:9px;overflow:hidden;background:#ECEDF1;flex-shrink:0}
+.ytt-th img{width:100%;height:100%;object-fit:cover;display:block}
+.ytt-tx{min-width:0;display:flex;flex-direction:column;gap:2px}
+.ytt-tx b{font-size:14px;font-weight:600;color:var(--ink)}
+.ytt-tx small{font-size:12px;color:var(--muted)}
+.ytt-mini{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#8A90A0;flex-shrink:0}
+.ytt-mini:active{background:#F3F3F6}
 .pg-val.muted{color:var(--muted);font-weight:500;font-size:13px}
 .react-layer{position:absolute;left:0;right:0;bottom:120px;height:260px;pointer-events:none;z-index:75}
 .pg-val{font-weight:600;color:var(--accent);font-size:14px}
@@ -2350,6 +2469,8 @@ function home() {
       </section>
     </div>`}
 
+    ${gameCard()}
+    ${yttCard()}
     <div class="px sec-head"><h2>Recently played</h2>${recentRows().length ? '<button class="press see-all" data-act="history">See all</button>' : ''}</div>
     <div class="px" style="display:flex;flex-direction:column">
       ${recentRows().length ? '' : `<div class="empty-card">
@@ -2848,23 +2969,25 @@ function render() {
   const screenChanged = last.tab !== S.tab;
   const overlayOpened = S.overlay && last.overlay !== S.overlay;
   OPENED.pl = plSheetOpen() && !last.pl;
-  OPENED.notes = S.notesOpen && !last.notes; OPENED.profile = S.profile && !last.profile; OPENED.all = S.showAll && !last.all; OPENED.upd = S.updateReady && !last.upd; OPENED.invite = S.inviteSheet && !last.invite;
+  OPENED.notes = S.notesOpen && !last.notes; OPENED.profile = S.profile && !last.profile; OPENED.all = S.showAll && !last.all; OPENED.upd = S.updateReady && !last.upd; OPENED.game = !!S.game && !last.game; OPENED.ytt = !!S.yttOpen && !last.ytt; OPENED.invite = S.inviteSheet && !last.invite;
   const body = S.tab === 'home' ? home() : S.tab === 'upload' ? upload() : songsScreen();
   app.innerHTML =
     `<div class="scroll"><div class="${screenChanged ? 'screen' : ''}">${body}</div></div>` +
     (S.hasPlayed === false ? '' : mini()) + navBar() +
     (S.overlay === 'player' ? player(overlayOpened) : '') +
-    (S.overlay === 'session' && S.session ? session(overlayOpened) : '') +
-    (S.showAll ? allNotes() : '') + (S.profile ? profileSheet() : '') + (S.profile && S.confirmDelete ? deleteDialog() : '') + (S.profile && S.renameOpen ? renameDialog() : '') + (S.inviteSheet ? inviteSheet() : '') + plSheets() + banner() + updateCard() + toastHTML() + grain();
+    (S.overlay === 'session' && S.session ? session(overlayOpened) : '') + (S.game ? gameView() : '') + (S.yttOpen ? yttView() : '') +
+    (S.showAll ? allNotes() : '') + (S.profile ? profileSheet() : '') + (S.profile && S.confirmDelete ? deleteDialog() : '') + (S.profile && S.renameOpen ? renameDialog() : '') + (S.inviteSheet ? inviteSheet() : '') + plSheets() + banner() + gInviteCard() + yttInviteCard() + updateCard() + toastHTML() + grain();
   syncPlaying(); syncAudio(); fitAll();
   const sc = app.querySelector('.scroll'); sc.scrollTop = keep;
   const setStuck = () => app.classList.toggle('stuck', sc.scrollTop > 8);
   sc.addEventListener('scroll', setStuck, { passive: true }); setStuck();
   const notesEl = app.querySelector('#notes'); if (notesEl) notesEl.scrollTop = notesEl.scrollHeight;
   if (focusId) { const f = document.getElementById(focusId); if (f && f.focus) { f.focus(); if (f.setSelectionRange && f.value) f.setSelectionRange(f.value.length, f.value.length); } }
-  last = { tab: S.tab, overlay: S.overlay, notes: S.notesOpen, profile: S.profile, all: S.showAll, invite: S.inviteSheet, pl: plSheetOpen(), upd: S.updateReady };
+  last = { tab: S.tab, overlay: S.overlay, notes: S.notesOpen, profile: S.profile, all: S.showAll, invite: S.inviteSheet, pl: plSheetOpen(), upd: S.updateReady, game: !!S.game, ytt: !!S.yttOpen };
   saveState(); ytPlace();
   if (OPENED.profile) countUp(app.querySelector('.pd-km b[data-count]'));
+  if (S.game) gameAfterRender();
+  if (S.yttOpen) { yttUI(); if (OPENED.ytt) { setTimeout(ytPlace, 120); setTimeout(ytPlace, 460); } }   // follow the screen while it slides up
   updateProgress();
 }
 function syncPlaying() {
@@ -3108,6 +3231,7 @@ function undoBar(msg, onUndo) {
 let bannerT, pendingRender = false;
 /* background events (partner activity) wait while you're typing, so the field never loses focus mid-word */
 function softRender() {
+  if (typeof gDrawingNow !== 'undefined' && gDrawingNow) { pendingRender = true; return; }   // never interrupt a pen stroke
   const a = document.activeElement;
   if (!onboarding() && a && a.tagName === 'INPUT' && app.contains(a)) { pendingRender = true; return; }
   render();
@@ -3288,6 +3412,35 @@ app.addEventListener('click', e => {
     case 'laterupdate': S.updateReady = false; render(); break;
     case 'sendall': sendAll(); break;
     case 'sendses': sendSes(); break;
+    case 'gopen': gOpenLobby(); break;
+    case 'yttopen': S.yttOpen = true; S.yttInvite = null; render(); yttEnsurePlayer(); yttHello(); trackMe(); setTimeout(yttApply, 50); break;
+    case 'yttjoin': S.yttOpen = true; S.yttInvite = null; render(); yttEnsurePlayer(); yttHello(); trackMe(); setTimeout(yttApply, 50); break;
+    case 'yttnojoin': S.yttInvite = null; render(); break;
+    case 'yttclose': S.yttOpen = false; render(); trackMe(); break;
+    case 'ytttoggle': yttToggle(); break;
+    case 'yttprev': yttPrev(); break;
+    case 'yttnext': yttNext(); break;
+    case 'ytttap': S.yttTap = false; if (YTS.player) { yttExpect(1); try { YTS.player.playVideo(); } catch (e) {} } render(); setTimeout(yttApply, 400); break;
+    case 'yttsearch': yttSearch(); break;
+    case 'yttclearres': YTS.results = []; YTS.searchMsg = ''; render(); break;
+    case 'yttplayat': yttPlayAt(+d.i); break;
+    case 'yttremove': yttRemove(+d.i); break;
+    case 'yttaddnow': if (YTS.results[+d.i]) yttAdd(YTS.results[+d.i], 'now'); break;
+    case 'yttaddnext': if (YTS.results[+d.i]) yttAdd(YTS.results[+d.i], 'next'); break;
+    case 'yttaddend': if (YTS.results[+d.i]) yttAdd(YTS.results[+d.i], 'end'); break;
+    case 'gcat': if (S.game && S.game.phase === 'lobby') { S.game.cat = d.c; render(); } break;
+    case 'ginvite': gInvite(); break;
+    case 'gquit': gQuit(); break;
+    case 'gaccept': gAcceptInvite(); break;
+    case 'gdecline': if (S.gInvite) { bcast('game', { type: 'decline', gid: S.gInvite.gid }); S.gInvite = null; render(); } break;
+    case 'gchoose': gChoose(+d.i); break;
+    case 'gcolor': S.gTool = { c: d.c, w: (S.gTool && S.gTool.w) || 0.014, e: false }; render(); break;
+    case 'gsize': S.gTool = Object.assign({ c: '#17181D', w: 0.014, e: false }, S.gTool); S.gTool.w = S.gTool.w > 0.02 ? 0.014 : 0.032; S.gTool.e = false; render(); break;
+    case 'gerase': S.gTool = Object.assign({ c: '#17181D', w: 0.014, e: false }, S.gTool); S.gTool.e = !S.gTool.e; render(); break;
+    case 'gundo': gUndo(); break;
+    case 'gclear': gClear(); break;
+    case 'gguess': gGuess(); break;
+    case 'gagain': { const cat = S.game ? S.game.cat : 'Animals'; S.game = null; gOpenLobby(); S.game.cat = cat; gInvite(); break; }
     case 'delbackdrop': if (!S.deleting) { S.confirmDelete = false; render(); } break;
     case 'deleteacctno': S.confirmDelete = false; render(); break;
     case 'deleteacctyes': deleteAccount(); break;
@@ -3325,6 +3478,9 @@ app.addEventListener('input', e => {
   if (id === 'msgIn') S.msgDraft = v;
   if (id === 'allIn') { S.allDraft = v; const b = app.querySelector('.lt-compose button'); if (b) b.classList.toggle('on', !!v.trim()); }
   if (id === 'nickIn') S.nickDraft = v;
+  if (id === 'gIn') S.gDraft = v;
+  if (id === 'yttQ') S.yttQ = v;
+  if (id === 'yttSeek') { S.yttDragging = true; const a = app.querySelector('[data-ytt-t]'); if (a) a.textContent = yttFmt(+v); e.target.style.setProperty('--p', (+v / Math.max(1, +e.target.max) * 100) + '%'); }
   if (id === 'sesIn') { S.sesDraft = v; const b = app.querySelector('.ses-compose button'); if (b) b.classList.toggle('on', !!v.trim()); }
   if (S.up && id === 'upT') S.up.t = v;
   if (S.up && id === 'upA') S.up.a = v;
@@ -3370,6 +3526,7 @@ app.addEventListener('mousedown', e => { if (e.target.closest('[data-act="sendno
   vv.addEventListener('resize', sync); vv.addEventListener('scroll', sync);
   window.addEventListener('scroll', () => { if (window.scrollY) window.scrollTo(0, 0); });
 })();
+app.addEventListener('change', e => { if (e.target.id === 'yttSeek') { S.yttDragging = false; yttSeek(+e.target.value); } });
 app.addEventListener('keydown', e => {
   if (e.key !== 'Enter') return;
   if (onboarding()) {
@@ -3381,6 +3538,8 @@ app.addEventListener('keydown', e => {
   if (e.target.id === 'msgIn') { e.preventDefault(); sendMsg(); }
   if (e.target.id === 'allIn') { e.preventDefault(); sendAll(); }
   if (e.target.id === 'sesIn') { e.preventDefault(); sendSes(); }
+  if (e.target.id === 'gIn') { e.preventDefault(); gGuess(); }
+  if (e.target.id === 'yttQ') { e.preventDefault(); yttSearch(); }
   if (e.target.id === 'nickIn') { e.preventDefault(); saveNickname(); }
   if (e.target.id === 'plName') { e.preventDefault(); plAction('plsave', {}); }
 });
@@ -3647,6 +3806,7 @@ function enterApp() {
   setTimeout(takeSharedSong, 300);
   setTimeout(ensurePush, 1200);
   setTimeout(refreshLocations, 2000);
+  window.__hummEntered = true; setTimeout(applyPendingLink, 1200);
   { const q = new URLSearchParams(location.search), o = q.get('open'); if (o) { q.delete('open'); history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); setTimeout(() => openFromPing(o), 50); } }
   const a = acct.load(); if (a) applyAccount(a);
   const msgs = S.messages, notes = S.notes;
@@ -3859,7 +4019,9 @@ function subscribe() {
     .on('broadcast', { event: 'session' }, m => onSessionMsg(m.payload || {}))
     .on('broadcast', { event: 'thinking' }, () => onThinking())
     .on('broadcast', { event: 'react' }, m => remoteReact((m.payload || {}).kind))
-    .subscribe(status => { if (status === 'SUBSCRIBED') trackMe(); });
+    .on('broadcast', { event: 'game' }, m => onGameMsg(m.payload || {}))
+    .on('broadcast', { event: 'ytt' }, m => onYttMsg(m.payload || {}))
+    .subscribe(status => { if (status === 'SUBSCRIBED') { trackMe(); if (typeof yttHello === 'function' && (YTS.player || S.yttOpen || YTS.q.queue.length)) yttHello(); } });
   CLOUD.chan = ch;
 }
 function onNoteChange(p) {
@@ -3932,7 +4094,7 @@ function trackMe() {
   presenceT = setTimeout(() => {
     if (!CLOUD.chan) return;
     const st = S.status.A ? { k: S.status.A.k, text: S.status.A.text, at: S.status.A.at || Date.now() } : null;
-    try { CLOUD.chan.track({ song_id: S.curId || null, playing: !!S.playing, pos: Math.round(S.progress || 0), at: Date.now(), status: st, name: ME.name, build: typeof BUILD === 'string' ? BUILD : '' }); } catch (e) {}
+    try { CLOUD.chan.track({ song_id: S.curId || null, playing: !!S.playing, pos: Math.round(S.progress || 0), at: Date.now(), status: st, name: ME.name, ytt: !!S.yttOpen, build: typeof BUILD === 'string' ? BUILD : '' }); } catch (e) {}
   }, 250);
 }
 function bcast(event, payload) { if (CLOUD.chan) try { CLOUD.chan.send({ type: 'broadcast', event, payload: payload || {} }); } catch (e) {} }
@@ -3990,10 +4152,763 @@ function onSessionMsg(m) {
     if (document.hidden) phoneNotify(`${P.name} left`, `You're still listening to ${song(S.curId).t}`, 'msg');
   }
 }
+/* =====================================================================
+   DRAW & GUESS: a little Pictionary for the two of you.
+   One draws, the other guesses, live between both phones. Turns swap, 3 rounds each.
+   ===================================================================== */
+const G_CATS = {
+  'Animals': ['elephant', 'giraffe', 'cat', 'dog', 'peacock', 'tiger', 'monkey', 'snake', 'fish', 'butterfly', 'cow', 'camel', 'penguin', 'rabbit', 'owl', 'crocodile', 'parrot', 'horse', 'frog', 'turtle', 'lion', 'spider', 'octopus', 'squirrel'],
+  'Indian food': ['samosa', 'biryani', 'dosa', 'pani puri', 'chai', 'paratha', 'idli', 'pav bhaji', 'maggi', 'pakora', 'chole bhature', 'momos', 'rajma chawal', 'dal', 'roti', 'pizza', 'burger', 'vada pav', 'kachori', 'lassi', 'poha', 'thali', 'pickle', 'dhokla'],
+  'Sweets': ['gulab jamun', 'jalebi', 'ice cream', 'kulfi', 'rasgulla', 'laddoo', 'cake', 'cupcake', 'chocolate', 'donut', 'cookie', 'kheer', 'barfi', 'cotton candy', 'lollipop', 'candy', 'brownie', 'gajar halwa', 'popsicle', 'muffin'],
+  'Bollywood': ['Sholay', 'Lagaan', '3 Idiots', 'Dangal', 'PK', 'Kal Ho Naa Ho', 'Taare Zameen Par', 'Dilwale Dulhania Le Jayenge', 'Kuch Kuch Hota Hai', 'Queen', 'Barfi', 'Krrish', 'Dhoom', 'Bahubali', 'Jab We Met', 'Zindagi Na Milegi Dobara', 'Chak De India', 'Munna Bhai', 'Om Shanti Om', 'Yeh Jawaani Hai Deewani', 'Andhadhun', 'Golmaal', 'Don', 'Kabir Singh'],
+  'Music': ['guitar', 'tabla', 'headphones', 'microphone', 'piano', 'drums', 'violin', 'flute', 'concert', 'DJ', 'radio', 'speaker', 'dhol', 'sitar', 'singing', 'dancing', 'karaoke', 'trumpet', 'harmonium', 'music note', 'vinyl record', 'earphones'],
+  'At home': ['sofa', 'bed', 'fridge', 'fan', 'clock', 'lamp', 'door', 'window', 'mirror', 'pillow', 'television', 'pressure cooker', 'broom', 'bucket', 'curtains', 'plant', 'remote', 'toothbrush', 'kettle', 'blanket', 'washing machine', 'chair', 'stairs', 'key'],
+  'Places in India': ['Taj Mahal', 'India Gate', 'Goa beach', 'Himalayas', 'Red Fort', 'Qutub Minar', 'Gateway of India', 'Lotus Temple', 'Hawa Mahal', 'Varanasi ghat', 'Mumbai local', 'Kerala houseboat', 'Golden Temple', 'Charminar', 'Marine Drive', 'Rishikesh', 'Ladakh', 'Shimla', 'Jaipur', 'Kashmir', 'Mysore Palace', 'Sundarbans'],
+  'Festivals': ['Diwali', 'Holi', 'Rakhi', 'Christmas', 'Eid', 'kite flying', 'Ganesh Chaturthi', 'garba', 'birthday', 'wedding', 'New Year', 'fireworks', 'rangoli', 'diya', 'mehendi', 'Karva Chauth', 'Durga Puja', 'Lohri', 'Onam', 'Pongal', 'gift', 'balloons'],
+  'Sports': ['cricket', 'football', 'badminton', 'tennis', 'swimming', 'kabaddi', 'chess', 'carrom', 'cycling', 'yoga', 'boxing', 'basketball', 'running', 'hockey', 'skating', 'archery', 'wrestling', 'golf', 'table tennis', 'volleyball', 'gym', 'ludo'],
+  'Jobs': ['doctor', 'teacher', 'chef', 'pilot', 'police', 'farmer', 'artist', 'singer', 'dancer', 'designer', 'nurse', 'astronaut', 'firefighter', 'photographer', 'tailor', 'barber', 'postman', 'engineer', 'dentist', 'scientist', 'driver', 'shopkeeper'],
+  'Nature': ['sun', 'moon', 'rainbow', 'rain', 'mountain', 'river', 'tree', 'flower', 'volcano', 'cloud', 'lightning', 'snow', 'beach', 'waterfall', 'forest', 'desert', 'star', 'island', 'leaf', 'cactus', 'sunset', 'ocean'],
+  'Travel': ['airplane', 'train', 'auto rickshaw', 'bus', 'car', 'bicycle', 'boat', 'suitcase', 'passport', 'map', 'tent', 'hotel', 'road trip', 'helicopter', 'scooter', 'ticket', 'camera', 'compass', 'backpack', 'metro', 'bridge', 'traffic light'],
+  'Actions': ['sleeping', 'cooking', 'swimming', 'laughing', 'crying', 'reading', 'dancing', 'singing', 'running', 'shopping', 'texting', 'hugging', 'clapping', 'jumping', 'eating', 'yawning', 'brushing teeth', 'taking a selfie', 'driving', 'praying', 'waving', 'writing'],
+  'Feelings': ['happy', 'sad', 'angry', 'sleepy', 'in love', 'scared', 'bored', 'excited', 'shy', 'hungry', 'tired', 'surprised', 'confused', 'proud', 'cold', 'sick', 'worried', 'calm', 'missing you', 'nervous'],
+  'Everyday things': ['phone', 'umbrella', 'scissors', 'glasses', 'watch', 'shoes', 'bag', 'pen', 'book', 'lock', 'wallet', 'comb', 'candle', 'bottle', 'cup', 'spoon', 'ring', 'hat', 'laptop', 'charger', 'saree', 'kurta'],
+  'Family moments': ['selfie', 'video call', 'chai time', 'family photo', 'road trip', 'cooking together', 'hug', 'birthday cake', 'movie night', 'evening walk', 'gossip', 'scolding', 'tiffin', 'school bag', 'homework', 'Sunday nap', 'shopping', 'picnic', 'temple visit', 'lullaby']
+};
+G_CATS['Mix of everything'] = [];
+const G_TURN_SECS = 80, G_ROUNDS = 3;
+const G_COLORS = ['#17181D', 'var(--accent)', '#E04A6A', '#F2A33A', '#2EAA6E', '#8B5A3C'];
+let gTimer = null, gFlushT = null, gBuf = null, gDrawingNow = false, gSim = null;
+
+const gNorm = t => String(t || '').toLowerCase().normalize('NFKD').replace(/[^a-z0-9]/g, '');
+function gLev(a, b) {
+  const m = a.length, n = b.length; if (Math.abs(m - n) > 2) return 9;
+  const d = Array.from({ length: m + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= n; j++) d[0][j] = j;
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[m][n];
+}
+const gMask = (w, shown) => [...w].map((ch, i) => /[a-z0-9]/i.test(ch) ? (shown && shown.includes(i) ? ch : '_') : ch === ' ' ? '  ' : ch).join('');
+function gPickWords(cat) {
+  const pool = cat === 'Mix of everything' ? Object.entries(G_CATS).filter(([k]) => k !== 'Mix of everything').flatMap(([k, ws]) => ws.map(w => [w, k])) : G_CATS[cat].map(w => [w, cat]);
+  const used = new Set((S.game && S.game.used) || []), fresh = pool.filter(([w]) => !used.has(w));
+  const src = (fresh.length >= 3 ? fresh : pool).slice();
+  const out = []; while (out.length < 3 && src.length) out.push(src.splice(Math.floor(Math.random() * src.length), 1)[0]);
+  return out;
+}
+const gIsDrawer = () => !!(S.game && S.game.drawer === 'A');
+const gTotalTurns = () => G_ROUNDS * 2;
+function gSend(type, data) {
+  const msg = Object.assign({ type, gid: S.game && S.game.id }, data || {});
+  if (simulate()) { gSimHear(msg); return; }
+  bcast('game', msg);
+}
+
+/* ---------- starting a game ---------- */
+function gOpenLobby() {
+  if (!paired()) { S.inviteSheet = true; return render(); }
+  S.game = { id: newId(), phase: 'lobby', cat: S.gLastCat || 'Animals', host: true, scores: { A: 0, K: 0 }, turn: 0, strokes: [], feed: [], used: [] };
+  S.overlay = null; render();
+}
+function gInvite() {
+  const g = S.game; if (!g) return;
+  g.phase = 'waiting'; S.gLastCat = g.cat; render();
+  gSend('invite', { cat: g.cat });
+  pushPartner('game', { cat: g.cat }, 60 * 1000);
+}
+function gQuit(silent) {
+  if (S.game && !silent && S.game.phase !== 'lobby') gSend('quit');
+  clearInterval(gTimer); gTimer = null; gSim && gSim.stop(); gSim = null;
+  S.game = null; S.gInvite = null; render();
+}
+function gAcceptInvite() {
+  const inv = S.gInvite; if (!inv) return;
+  S.gInvite = null;
+  S.game = { id: inv.gid, phase: 'choosing', cat: inv.cat, host: false, scores: { A: 0, K: 0 }, turn: 0, drawer: 'K', strokes: [], feed: [], used: [] };
+  S.overlay = null; S.showAll = false; S.profile = false;
+  gSend('accept');
+  render();
+}
+function gBeginTurn(turn) {      // called on the phone whose turn it is to draw
+  const g = S.game; if (!g) return;
+  Object.assign(g, { turn, drawer: 'A', phase: 'choosing', options: gPickWords(g.cat), word: null, strokes: [], feed: [], hints: [], endsAt: 0 });
+  gSend('choosing', { turn });
+  render();
+}
+function gChoose(i) {
+  const g = S.game; if (!g || !g.options || !g.options[i]) return;
+  const [word, cat] = g.options[i];
+  Object.assign(g, { word, wcat: cat, phase: 'drawing', endsAt: Date.now() + G_TURN_SECS * 1000, hints: [], strokes: [], feed: [] });
+  g.used.push(word);
+  gSend('start', { turn: g.turn, mask: gMask(word), wcat: cat, secs: G_TURN_SECS });
+  gStartClock(); render();
+}
+function gStartClock() {
+  clearInterval(gTimer);
+  gTimer = setInterval(() => {
+    const g = S.game; if (!g || g.phase !== 'drawing') { clearInterval(gTimer); gTimer = null; return; }
+    const left = Math.max(0, Math.ceil((g.endsAt - Date.now()) / 1000));
+    const el = app.querySelector('[data-gtime]'); if (el) { el.textContent = left; el.parentElement.classList.toggle('low', left <= 10); }
+    if (gIsDrawer()) {
+      // little hints for the guesser: one letter at 40s, another at 20s
+      const letters = [...g.word].map((c, i) => /[a-z0-9]/i.test(c) ? i : -1).filter(i => i >= 0);
+      const want = left <= 20 ? 2 : left <= 40 ? 1 : 0;
+      if (letters.length > 3 && g.hints.length < want) {
+        const pool = letters.filter(i => !g.hints.includes(i)); g.hints.push(pool[Math.floor(Math.random() * pool.length)]);
+        gSend('hint', { mask: gMask(g.word, g.hints) });
+      }
+      if (left <= 0) gReveal(false);
+    }
+  }, 250);
+}
+function gReveal(ok, guessText) {        // drawer decides the turn is over
+  const g = S.game; if (!g || g.phase !== 'drawing') return;
+  const left = Math.max(0, Math.ceil((g.endsAt - Date.now()) / 1000));
+  const gg = ok ? 50 + Math.round(left * 1.5) : 0, dg = ok ? 30 + left : 0;
+  g.scores.K += gg; g.scores.A += dg;
+  g.phase = 'reveal'; g.last = { word: g.word, ok, gg, dg, by: 'K' };
+  gSend('reveal', { word: g.word, ok, gg, dg, turn: g.turn });
+  render(); gAfterReveal();
+}
+function gAfterReveal() {
+  const g = S.game; if (!g) return;
+  const t = g.turn;
+  setTimeout(() => {
+    if (!S.game || S.game.id !== g.id || S.game.phase !== 'reveal' || S.game.turn !== t) return;
+    if (t + 1 >= gTotalTurns()) { S.game.phase = 'over'; render(); return; }
+    // whoever just guessed draws next
+    if (g.last.by === 'K') { S.game.turn = t + 1; S.game.drawer = 'K'; S.game.phase = 'choosing'; S.game.strokes = []; S.game.feed = []; render(); }
+    else gBeginTurn(t + 1);
+  }, 3400);
+}
+
+/* ---------- guessing ---------- */
+function gGuess() {
+  const g = S.game; const text = (S.gDraft || '').trim(); if (!g || !text || g.phase !== 'drawing' || gIsDrawer()) return;
+  S.gDraft = '';
+  const inp = app.querySelector('#gIn'); if (inp) inp.value = '';
+  g.feed.push({ by: 'A', text, pending: true }); gRefreshFeed();
+  gSend('guess', { text });
+}
+function gJudge(text) {            // drawer checks the guess against the secret word
+  const g = S.game; if (!g || g.phase !== 'drawing') return;
+  const a = gNorm(text), b = gNorm(g.word);
+  const ok = !!a && (a === b || (b.length > 3 && a.replace(/s$/, '') === b.replace(/s$/, '')));
+  const close = !ok && b.length > 4 && gLev(a, b) <= (b.length > 8 ? 2 : 1);
+  g.feed.push({ by: 'K', text, ok, close });
+  gSend('judged', { text, ok, close });
+  if (ok) gReveal(true, text); else gRefreshFeed();
+}
+
+/* ---------- drawing ---------- */
+function gCanvas() { return app.querySelector('#gCanvas'); }
+function gFit() {
+  const c = gCanvas(); if (!c) return;
+  const r = c.getBoundingClientRect(), dpr = Math.min(3, window.devicePixelRatio || 1);
+  if (c.width !== Math.round(r.width * dpr)) { c.width = Math.round(r.width * dpr); c.height = Math.round(r.height * dpr); }
+  gRedraw();
+}
+function gColor(c) { return c === 'var(--accent)' ? getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#2149E8' : c; }
+function gPaint(ctx, st, from) {
+  const W = ctx.canvas.width, p = st.p; if (!p.length) return;
+  ctx.strokeStyle = st.e ? '#ffffff' : gColor(st.c); ctx.fillStyle = ctx.strokeStyle;
+  ctx.lineWidth = st.w * W; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  if (p.length === 2) { ctx.beginPath(); ctx.arc(p[0] * W, p[1] * W, st.w * W / 2, 0, Math.PI * 2); ctx.fill(); return; }
+  const s = Math.max(0, (from || 0) - 2);
+  ctx.beginPath(); ctx.moveTo(p[s] * W, p[s + 1] * W);
+  for (let i = s + 2; i < p.length; i += 2) {
+    const mx = (p[i - 2] + p[i]) / 2 * W, my = (p[i - 1] + p[i + 1]) / 2 * W;
+    ctx.quadraticCurveTo(p[i - 2] * W, p[i - 1] * W, mx, my);
+  }
+  ctx.lineTo(p[p.length - 2] * W, p[p.length - 1] * W); ctx.stroke();
+}
+function gRedraw() {
+  const c = gCanvas(); if (!c || !S.game) return;
+  const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+  S.game.strokes.forEach(st => gPaint(ctx, st));
+}
+function gPoint(e) { const r = gCanvas().getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.width))]; }
+function gFlush() {
+  gFlushT = null; if (!gBuf) return;
+  const st = gBuf.st, from = gBuf.sent;
+  if (st.p.length > from) { gSend('st', { sid: st.id, c: st.c, w: st.w, e: st.e ? 1 : 0, p: st.p.slice(from).map(v => Math.round(v * 1000) / 1000), first: from === 0 ? 1 : 0 }); gBuf.sent = st.p.length; }
+  if (gBuf.done) gBuf = null;
+}
+app.addEventListener('pointerdown', e => {
+  if (e.target.id !== 'gCanvas' || !gIsDrawer() || S.game.phase !== 'drawing') return;
+  e.preventDefault(); e.target.setPointerCapture(e.pointerId); gDrawingNow = true;
+  const g = S.game, tool = S.gTool || { c: '#17181D', w: 0.014, e: false };
+  const st = { id: newId().slice(0, 8), c: tool.c, w: tool.e ? 0.07 : tool.w, e: tool.e, p: gPoint(e) };
+  g.strokes.push(st); gBuf = { st, sent: 0, done: false };
+  gPaint(gCanvas().getContext('2d'), st);
+  if (!gFlushT) gFlushT = setTimeout(gFlush, 70);
+});
+app.addEventListener('pointermove', e => {
+  if (!gDrawingNow || e.target.id !== 'gCanvas' || !gBuf) return;
+  const st = gBuf.st, n = st.p.length;
+  (e.getCoalescedEvents ? e.getCoalescedEvents() : [e]).forEach(ev => { const [x, y] = gPoint(ev); const lx = st.p[st.p.length - 2], ly = st.p[st.p.length - 1]; if (Math.hypot(x - lx, y - ly) > 0.002) st.p.push(x, y); });
+  gPaint(gCanvas().getContext('2d'), st, n);
+  if (!gFlushT) gFlushT = setTimeout(gFlush, 70);
+});
+const gUp = () => { if (!gDrawingNow) return; gDrawingNow = false; if (gBuf) { gBuf.done = true; clearTimeout(gFlushT); gFlush(); } if (pendingRender) { pendingRender = false; render(); } };
+app.addEventListener('pointerup', gUp); app.addEventListener('pointercancel', gUp);
+function gUndo() { const g = S.game; if (!g || !gIsDrawer()) return; const st = g.strokes.pop(); if (!st) return; gRedraw(); gSend('undo', { sid: st.id }); }
+function gClear() { const g = S.game; if (!g || !gIsDrawer() || !g.strokes.length) return; g.strokes = []; gRedraw(); gSend('clear'); }
+
+/* ---------- messages from the other phone ---------- */
+function onGameMsg(m) {
+  if (!m || !m.type) return;
+  const g = S.game;
+  if (m.type === 'invite') {
+    if (g && g.phase !== 'lobby') return;
+    S.gInvite = { gid: m.gid, cat: m.cat }; softRender();
+    if (document.hidden) phoneNotify(`${P.name} wants to play Draw & guess`, m.cat + ' · tap to play', 'msg');
+    return;
+  }
+  if (!g || m.gid !== g.id) { if (m.type === 'quit' && S.gInvite && S.gInvite.gid === m.gid) { S.gInvite = null; softRender(); } return; }
+  switch (m.type) {
+    case 'accept': if (g.phase === 'waiting') { flash(`${P.name} joined the game`, true); gBeginTurn(0); } break;
+    case 'decline': if (g.phase === 'waiting') { S.game = null; render(); flash(`${P.name} can’t play right now`); } break;
+    case 'quit': clearInterval(gTimer); S.game = null; render(); flash(`${P.name} left the game`); break;
+    case 'choosing': Object.assign(g, { turn: m.turn, drawer: 'K', phase: 'choosing', strokes: [], feed: [] }); render(); break;
+    case 'start':
+      Object.assign(g, { turn: m.turn, drawer: 'K', phase: 'drawing', mask: m.mask, wcat: m.wcat, endsAt: Date.now() + (m.secs || G_TURN_SECS) * 1000, strokes: [], feed: [] });
+      gStartClock(); render(); break;
+    case 'hint': g.mask = m.mask; { const el = app.querySelector('.g-mask'); if (el) el.textContent = m.mask; } break;
+    case 'st': {
+      let st = g.strokes.find(x => x.id === m.sid);
+      if (!st) { st = { id: m.sid, c: m.c, w: m.w, e: !!m.e, p: [] }; g.strokes.push(st); }
+      const from = st.p.length; st.p.push(...m.p);
+      const c = gCanvas(); if (c) gPaint(c.getContext('2d'), st, from);
+      break;
+    }
+    case 'undo': g.strokes = g.strokes.filter(x => x.id !== m.sid); gRedraw(); break;
+    case 'clear': g.strokes = []; gRedraw(); break;
+    case 'guess': if (gIsDrawer()) gJudge(m.text); break;
+    case 'judged': {
+      const f = g.feed.find(x => x.pending && x.text === m.text); if (f) Object.assign(f, { pending: false, ok: m.ok, close: m.close }); else g.feed.push({ by: 'A', text: m.text, ok: m.ok, close: m.close });
+      gRefreshFeed(); if (m.close) flash('So close!', true);
+      break;
+    }
+    case 'reveal':
+      g.scores.A += m.gg || 0; g.scores.K += m.dg || 0;
+      Object.assign(g, { phase: 'reveal', turn: m.turn, last: { word: m.word, ok: m.ok, gg: m.gg, dg: m.dg, by: 'A' } });
+      clearInterval(gTimer); render();
+      // you guessed (or tried): you draw next
+      setTimeout(() => { if (!S.game || S.game.id !== g.id || S.game.phase !== 'reveal' || S.game.turn !== m.turn) return; if (m.turn + 1 >= gTotalTurns()) { S.game.phase = 'over'; render(); } else gBeginTurn(m.turn + 1); }, 3400);
+      break;
+  }
+}
+function gRefreshFeed() {
+  const box = app.querySelector('.g-feed'); if (!box) return;
+  box.innerHTML = gFeedHTML(); box.scrollTop = box.scrollHeight;
+}
+function gFeedHTML() {
+  const g = S.game; if (!g) return '';
+  const items = g.feed.slice(-6);
+  if (!items.length) return `<div class="g-feed-empty">${gIsDrawer() ? `${esc(P.name)}’s guesses show up here` : 'type your guesses below'}</div>`;
+  return items.map(f => `<div class="g-guess ${f.by === 'A' ? 'me' : ''} ${f.ok ? 'ok' : ''} ${f.close ? 'close' : ''}"><b>${f.by === 'A' ? 'you' : esc(P.name.toLowerCase())}</b> ${esc(f.ok && !gIsDrawer() ? '' + f.text : f.text)}${f.ok ? ' ✓' : f.close ? ' · so close' : ''}</div>`).join('');
+}
+
+/* ---------- screens ---------- */
+const G_PEN = svg(18, '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>', 'fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"');
+function gameCard() {
+  if (!paired() || S.game) return '';
+  return `<div class="px" style="margin-top:18px"><button class="press g-card" data-act="gopen">
+    <span class="g-card-art" aria-hidden="true">${gDoodle(44)}</span>
+    <span style="flex:1;min-width:0;text-align:left"><b>Draw & guess</b><small>A quick game with ${esc(P.name)} · ${Object.keys(G_CATS).length} categories</small></span>
+    <span class="g-card-go">Play</span>
+  </button></div>`;
+}
+function gDoodle(size) {   // a pencil scribbling a little heart, in the app's thin ink style
+  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path class="g-scrib" d="M8 30c3-6 8-6 9-1s-4 9-4 9 9-3 12-8"/><path d="M30 8l10 10-14 14-11 2 2-11z" fill="#fff"/><path d="M27 11l10 10"/><path d="M17 23l8 8"/></svg>`;
+}
+function gInviteCard() {
+  if (!S.gInvite || S.game) return '';
+  return `<div class="banner g-inv" role="status">
+    <span class="g-inv-ico">${gDoodle(30)}</span>
+    <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">${esc(P.name)} wants to play Draw & guess</div><div class="muted ell" style="font-size:12px">${esc(S.gInvite.cat)}</div></div>
+    <button class="press join-btn" data-act="gaccept">Play</button>
+    <button class="press" data-act="gdecline" aria-label="Not now" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#8A90A0">${I.x}</button>
+  </div>`;
+}
+function gScoreBar() {
+  const g = S.game, round = Math.min(G_ROUNDS, Math.floor(g.turn / 2) + 1);
+  return `<div class="g-top">
+    <button class="icon-btn press" data-act="gquit" aria-label="Leave game">${I.x}</button>
+    <div class="g-round">round ${round} of ${G_ROUNDS}</div>
+    <div class="g-score"><span>${esc(ME.ini)} <b>${g.scores.A}</b></span><i>·</i><span>${esc(P.ini)} <b>${g.scores.K}</b></span></div>
+  </div>`;
+}
+function gameView() {
+  const g = S.game; if (!g) return '';
+  const opened = OPENED.game ? 'sheetUp' : '';
+  if (g.phase === 'lobby' || g.phase === 'waiting') {
+    const cats = Object.keys(G_CATS);
+    return `<div class="overlay g-ov ${opened}">
+      <div class="g-top"><button class="icon-btn press" data-act="gquit" aria-label="Close">${I.x}</button><div class="g-round">draw & guess</div><span></span></div>
+      <div class="g-lobby">
+        <div class="g-hero">${gDoodle(84)}</div>
+        <h1 class="g-h">Draw & guess</h1>
+        <p class="g-sub">One of you draws, the other guesses. ${G_ROUNDS} rounds each, ${G_TURN_SECS} seconds a turn.</p>
+        <div class="g-label">Pick a category</div>
+        <div class="g-cats">${cats.map(c => `<button class="press g-cat ${g.cat === c ? 'on' : ''}" data-act="gcat" data-c="${esc(c)}" ${g.phase === 'waiting' ? 'disabled' : ''}>${esc(c)}</button>`).join('')}</div>
+      </div>
+      <div class="g-foot">${g.phase === 'waiting'
+        ? `<div class="g-wait"><span class="g-dots"><i></i><i></i><i></i></span> Waiting for ${esc(P.name)} to join…</div><button class="press g-ghost" data-act="gquit">Cancel</button>`
+        : `<button class="press g-go" data-act="ginvite">Play with ${esc(P.name)}</button>`}</div>
+    </div>`;
+  }
+  if (g.phase === 'over') {
+    const a = g.scores.A, k = g.scores.K;
+    const head = a === k ? 'It’s a tie!' : a > k ? 'You win!' : `${esc(P.name)} wins!`;
+    return `<div class="overlay g-ov">
+      <div class="g-top"><button class="icon-btn press" data-act="gquit" aria-label="Close">${I.x}</button><div class="g-round">game over</div><span></span></div>
+      <div class="g-lobby g-over">
+        <div class="g-hero">${gDoodle(84)}</div>
+        <h1 class="g-h">${head}</h1>
+        <div class="g-final"><div><span>${esc(ME.name)}</span><b>${a}</b></div><div><span>${esc(P.name)}</span><b>${k}</b></div></div>
+        <p class="g-sub">${esc(g.cat)}</p>
+      </div>
+      <div class="g-foot"><button class="press g-go" data-act="gagain">Play again</button><button class="press g-ghost" data-act="gquit">Done</button></div>
+    </div>`;
+  }
+  const drawer = gIsDrawer(), left = g.endsAt ? Math.max(0, Math.ceil((g.endsAt - Date.now()) / 1000)) : G_TURN_SECS;
+  let wordRow = '';
+  if (g.phase === 'choosing') wordRow = drawer ? 'Pick a word to draw' : `${esc(P.name)} is picking a word…`;
+  else if (g.phase === 'drawing') wordRow = drawer ? `Draw: <b>${esc(g.word)}</b>` : `<span class="g-mask">${esc(g.mask || '')}</span><span class="g-len">${(g.mask || '').replace(/[^_a-z0-9]/gi, '').length} letters</span>`;
+  else if (g.phase === 'reveal') wordRow = `It was <b>${esc(g.last.word)}</b>`;
+  const tools = drawer && g.phase === 'drawing' ? `<div class="g-tools">
+      ${G_COLORS.map(c => `<button class="press g-sw ${(S.gTool || {}).c === c && !(S.gTool || {}).e || (!S.gTool && c === '#17181D') ? 'on' : ''}" data-act="gcolor" data-c="${c}" style="background:${c}" aria-label="Colour"></button>`).join('')}
+      <span class="g-sep"></span>
+      <button class="press g-tool ${(S.gTool || {}).w > 0.02 ? 'on' : ''}" data-act="gsize" aria-label="Pen size"><i style="width:${(S.gTool || {}).w > 0.02 ? 12 : 6}px;height:${(S.gTool || {}).w > 0.02 ? 12 : 6}px"></i></button>
+      <button class="press g-tool ${(S.gTool || {}).e ? 'on' : ''}" data-act="gerase" aria-label="Eraser">${svg(18, '<path d="M7 20h10"/><path d="m5 14 8-8a2 2 0 0 1 3 0l3 3a2 2 0 0 1 0 3l-7 7H8z"/>', 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"')}</button>
+      <button class="press g-tool" data-act="gundo" aria-label="Undo">${svg(18, '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>', 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"')}</button>
+      <button class="press g-tool" data-act="gclear" aria-label="Clear">${svg(18, '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/>', 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"')}</button>
+    </div>` : '';
+  const choose = g.phase === 'choosing' && drawer ? `<div class="g-choose">${(g.options || []).map(([w, c], i) => `<button class="press g-opt" data-act="gchoose" data-i="${i}"><b>${esc(w)}</b>${g.cat === 'Mix of everything' ? `<small>${esc(c)}</small>` : ''}</button>`).join('')}</div>` : '';
+  const waitArt = g.phase === 'choosing' && !drawer ? `<div class="g-waitart">${gDoodle(70)}<span class="g-dots"><i></i><i></i><i></i></span></div>` : '';
+  const reveal = g.phase === 'reveal' ? `<div class="g-reveal"><div class="g-rv-card">
+      <div class="g-rv-h">${g.last.ok ? (g.last.by === 'A' ? 'You got it!' : `${esc(P.name)} got it!`) : 'Time’s up!'}</div>
+      <div class="g-rv-w">${esc(g.last.word)}</div>
+      ${g.last.ok ? `<div class="g-rv-pts">${g.last.by === 'A' ? `you +${g.last.gg} · ${esc(P.name.toLowerCase())} +${g.last.dg}` : `${esc(P.name.toLowerCase())} +${g.last.gg} · you +${g.last.dg}`}</div>` : ''}
+    </div></div>` : '';
+  return `<div class="overlay g-ov ${opened}">
+    ${gScoreBar()}
+    <div class="g-word"><span class="g-cat-tag">${esc(g.phase === 'drawing' && g.wcat ? g.wcat : g.cat)}</span><div class="g-word-t">${wordRow}</div>
+      ${g.phase === 'drawing' ? `<div class="g-clock ${left <= 10 ? 'low' : ''}"><span data-gtime>${left}</span>s</div>` : ''}</div>
+    <div class="g-board">
+      <canvas id="gCanvas" class="${drawer && g.phase === 'drawing' ? 'can-draw' : ''}"></canvas>
+      ${choose}${waitArt}${reveal}
+    </div>
+    ${tools}
+    <div class="g-feed">${gFeedHTML()}</div>
+    ${!drawer && g.phase === 'drawing' ? `<div class="g-in"><input id="gIn" placeholder="type your guess…" value="${esc(S.gDraft || '')}" autocomplete="off" autocapitalize="off" maxlength="60" enterkeyhint="send"><button class="press" data-act="gguess" aria-label="Guess">${icoSend}</button></div>` : ''}
+  </div>`;
+}
+function gameAfterRender() { if (S.game) requestAnimationFrame(gFit); }
+window.addEventListener('resize', () => { if (S.game) gFit(); });
+
+/* ---------- preview mode: a pretend partner so the game can be tried alone ---------- */
+const G_SKETCH = {
+  sun: [[.5, .5, .62, .5, .6, .6, .5, .64, .4, .6, .38, .5, .4, .4, .5, .36, .6, .4, .62, .5], [.5, .22, .5, .3], [.5, .7, .5, .78], [.22, .5, .3, .5], [.7, .5, .78, .5], [.3, .3, .36, .36], [.64, .64, .7, .7], [.7, .3, .64, .36], [.3, .7, .36, .64]],
+  house: [[.25, .5, .25, .8, .75, .8, .75, .5], [.2, .52, .5, .25, .8, .52], [.45, .8, .45, .65, .55, .65, .55, .8], [.32, .58, .4, .58, .4, .65, .32, .65, .32, .58]],
+  fish: [[.25, .5, .4, .38, .58, .38, .7, .5, .58, .62, .4, .62, .25, .5], [.7, .5, .82, .4, .82, .6, .7, .5], [.35, .47, .36, .48]],
+  tree: [[.47, .85, .47, .6], [.53, .85, .53, .6], [.5, .25, .32, .45, .4, .6, .6, .6, .68, .45, .5, .25]],
+  'ice cream': [[.38, .45, .5, .82, .62, .45], [.38, .45, .36, .36, .42, .28, .5, .26, .58, .28, .64, .36, .62, .45]]
+};
+function gSimHear(msg) {
+  if (!gSim) gSim = { timers: [], stop() { this.timers.forEach(clearTimeout); this.timers = []; } };
+  const later = (ms, f) => gSim.timers.push(setTimeout(() => { if (S.game) f(); }, ms));
+  const send = m => onGameMsg(Object.assign({ gid: S.game && S.game.id }, m));
+  if (msg.type === 'invite') later(1600, () => send({ type: 'accept' }));
+  if (msg.type === 'start') {            // you draw: pretend guesses
+    const word = S.game.word, others = (G_CATS[S.game.wcat] || []).filter(w => w !== word);
+    later(7000, () => send({ type: 'guess', text: others[0] || 'cat' }));
+    later(12000, () => send({ type: 'guess', text: others[3] || 'dog' }));
+    if (Math.random() < .8) later(16000 + Math.random() * 12000, () => send({ type: 'guess', text: word }));
+  }
+  if (msg.type === 'reveal') { gSim.stop(); later(3600, () => gSimDraw()); }
+  if (msg.type === 'guess' && S.game && S.game.simWord) {
+    const ok = gNorm(msg.text) === gNorm(S.game.simWord);
+    later(300, () => send({ type: 'judged', text: msg.text, ok, close: !ok && gLev(gNorm(msg.text), gNorm(S.game.simWord)) <= 1 }));
+    if (ok) later(600, () => { gSim.stop(); send({ type: 'reveal', word: S.game.simWord, ok: true, gg: 120, dg: 70, turn: S.game.turn }); });
+  }
+  if (msg.type === 'choosing' || msg.type === 'quit') gSim.stop();
+}
+function gSimDraw() {      // the pretend partner's turn to draw
+  const g = S.game; if (!g || g.phase !== 'choosing' || g.drawer !== 'K') return;
+  const words = Object.keys(G_SKETCH), word = words[Math.floor(Math.random() * words.length)];
+  g.simWord = word;
+  const send = m => onGameMsg(Object.assign({ gid: S.game && S.game.id }, m));
+  const later = (ms, f) => gSim.timers.push(setTimeout(() => { if (S.game) f(); }, ms));
+  later(1500, () => send({ type: 'start', turn: g.turn, mask: gMask(word), wcat: 'Mix of everything', secs: 60 }));
+  let t = 2500;
+  G_SKETCH[word].forEach((pts, si) => {
+    const sid = 'sim' + si;
+    for (let i = 0; i < pts.length; i += 4) { const chunk = pts.slice(i, i + 4); later(t, () => send({ type: 'st', sid, c: si === 0 ? 'var(--accent)' : '#17181D', w: 0.014, e: 0, p: chunk })); t += 260; }
+    t += 300;
+  });
+  later(60000 + 2500, () => { if (S.game && S.game.phase === 'drawing') send({ type: 'reveal', word, ok: false, gg: 0, dg: 0, turn: S.game.turn }); });
+}
+
+/* =====================================================================
+   YOUTUBE TOGETHER (test): a visible YouTube player kept in sync on both phones.
+   - The video is always visible (full width on its screen, or a 200x200 window while you browse), ads included.
+   - The screen is kept awake while it plays (Screen Wake Lock).
+   - Shared state: { queue, index, playing, pos, t0, rev, by }. Every control sends the whole state;
+     the newest revision wins, and each phone corrects itself to the expected position.
+   ===================================================================== */
+const YT_API_KEY = '';   // paste a YouTube Data API v3 key here to turn on search (restrict it to your site in Google Cloud)
+const YTT_KEY = 'humm-ytt';
+const YTS = {
+  q: { queue: [], index: 0, playing: false, pos: 0, t0: 0, rev: 0, by: '' },
+  stale: false, player: null, ready: false, apiLoading: false, loadedId: null, lastLoad: 0,
+  offset: null, samples: [], expect: { st: null, until: 0 }, lastSeek: 0, rateT: null,
+  results: [], searching: false, searchMsg: '', wake: null, pingT: null, endT: null
+};
+try {
+  const saved = JSON.parse(localStorage.getItem(YTT_KEY) || 'null');
+  if (saved && Array.isArray(saved.queue)) { YTS.q = Object.assign(YTS.q, saved, { playing: false, t0: Date.now() }); YTS.stale = true; }
+} catch (e) {}
+const yttSave = () => { try { const q = YTS.q; localStorage.setItem(YTT_KEY, JSON.stringify(Object.assign({}, q, { pos: yttExpected() }))); } catch (e) {} };
+const yttCur = () => YTS.q.queue[YTS.q.index] || null;
+const yttExpected = () => { const q = YTS.q; return Math.max(0, q.playing ? q.pos + (Date.now() - q.t0) / 1000 : q.pos); };
+const yttLead = () => !CLOUD.partner || String(uid() || '') < String(CLOUD.partner.id || '');
+const yttFmt = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const yttThumb = id => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`;
+const yttDecode = t => { const d = document.createElement('textarea'); d.innerHTML = String(t || ''); return d.value; };
+function yttIdFrom(text) {
+  const t = String(text || '').trim();
+  if (/^[A-Za-z0-9_-]{11}$/.test(t)) return t;
+  const m = t.match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+/* ---------- the player (lives outside the re-drawn screen, so it never reloads) ---------- */
+const yttHost = document.createElement('div'); yttHost.id = 'yttHost'; yttHost.className = 'off';
+yttHost.innerHTML = '<div id="yttFrame"></div><button class="ytt-expand" data-ytt-open aria-label="Open YouTube together">YouTube together</button><button class="ytt-tap" data-ytt-tap>Tap to join the music</button>';
+document.body.appendChild(yttHost);
+yttHost.querySelector('[data-ytt-open]').addEventListener('click', () => { if (!onboarding()) { S.yttOpen = true; render(); } });
+yttHost.querySelector('[data-ytt-tap]').addEventListener('click', () => {   // the phone only allows sound after a tap: start right inside it
+  S.yttTap = false; yttHost.classList.remove('need-tap');
+  if (YTS.player) { yttExpect(1); try { YTS.player.playVideo(); } catch (e) {} }
+  setTimeout(yttApply, 400);
+});
+function yttEnsurePlayer() {
+  if (YTS.player) return;
+  if (!/^https?:$/.test(location.protocol) && !(window.YT && window.YT.Player)) { flash('Open humm.. from its web link to play YouTube'); return; }
+  if (window.YT && window.YT.Player) return yttCreate();
+  if (YTS.apiLoading) return; YTS.apiLoading = true;
+  const prev = window.onYouTubeIframeAPIReady;
+  window.onYouTubeIframeAPIReady = () => { if (prev) try { prev(); } catch (e) {} yttCreate(); };
+  const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api';
+  s.onerror = () => { YTS.apiLoading = false; flash('YouTube couldn’t load. Check your connection'); };
+  document.head.appendChild(s);
+}
+function yttCreate() {
+  if (YTS.player) return;
+  YTS.player = new YT.Player('yttFrame', {
+    width: '100%', height: '100%', host: 'https://www.youtube-nocookie.com',
+    playerVars: { playsinline: 1, controls: 0, disablekb: 1, rel: 0, modestbranding: 1, iv_load_policy: 3, fs: 0, origin: /^https?:/.test(location.protocol) ? location.origin : undefined },
+    events: { onReady: () => { YTS.ready = true; yttApply(); }, onStateChange: e => yttOnState(e.data), onError: e => yttOnError(e.data) }
+  });
+}
+const yttState = () => { try { return YTS.player && YTS.player.getPlayerState ? YTS.player.getPlayerState() : -1; } catch (e) { return -1; } };
+const yttTime = () => { try { return YTS.player && YTS.player.getCurrentTime ? (YTS.player.getCurrentTime() || 0) : 0; } catch (e) { return 0; } };
+const yttDur = () => { try { return (YTS.player && YTS.player.getDuration && YTS.player.getDuration()) || (yttCur() && yttCur().secs) || 0; } catch (e) { return 0; } };
+const yttExpecting = st => YTS.expect.st === st && Date.now() < YTS.expect.until;
+const yttExpect = st => { YTS.expect = { st, until: Date.now() + 4000 }; };
+
+/* make this phone match the shared state */
+function yttApply() {
+  const q = YTS.q, cur = yttCur(), p = YTS.player;
+  yttWake(); ytPlace();
+  if (!cur) { if (p && YTS.ready && YTS.loadedId) { try { p.stopVideo(); } catch (e) {} YTS.loadedId = null; } return; }
+  if (!YTS.ready) { if (q.playing || S.yttOpen) yttEnsurePlayer(); return; }
+  const want = yttExpected();
+  if (YTS.loadedId !== cur.id) {
+    YTS.loadedId = cur.id; YTS.lastLoad = Date.now();
+    if (q.playing) { yttExpect(1); p.loadVideoById({ videoId: cur.id, startSeconds: want }); yttCheckAutoplay(); }
+    else { yttExpect(5); p.cueVideoById({ videoId: cur.id, startSeconds: want }); }
+    return;
+  }
+  const st = yttState();
+  if (q.playing && st !== 1 && st !== 3) { yttExpect(1); p.playVideo(); yttCheckAutoplay(); }
+  if (!q.playing && (st === 1 || st === 3)) { yttExpect(2); p.pauseVideo(); }
+  if (Math.abs(yttTime() - want) > 0.75) { p.seekTo(want, true); YTS.lastSeek = Date.now(); }
+}
+function yttCheckAutoplay() {
+  setTimeout(() => {
+    const st = yttState();
+    if (YTS.q.playing && st !== 1 && st !== 3 && !document.hidden) { S.yttTap = true; yttHost.classList.add('need-tap'); }
+  }, 1700);
+}
+function yttOnState(st) {
+  const q = YTS.q;
+  if (st === 1) {
+    S.yttTap = false; yttHost.classList.remove('need-tap');
+    if (S.playing) { S.playing = false; syncAudio(); softRender(); }                // humm.. MP3 stops while YouTube plays
+    if (!q.playing && !yttExpecting(1) && Date.now() - YTS.lastLoad > 1500) yttCommit(s => { s.playing = true; s.pos = yttTime(); });   // tapped play on the video itself
+    const cur = yttCur(), d = YTS.player.getVideoData ? YTS.player.getVideoData() : null;
+    if (cur && d && d.video_id === cur.id && (!cur.titleOk) && d.title) { yttMeta(cur.id, d.title, d.author); bcast('ytt', { k: 'meta', id: cur.id, title: d.title, author: d.author }); }
+  }
+  if (st === 2 && q.playing && !yttExpecting(2) && !document.hidden && Date.now() - YTS.lastLoad > 1500) {
+    yttCommit(s => { s.playing = false; s.pos = yttTime(); });                         // paused from the video itself
+  }
+  if (st === 0) yttAdvance('ended');
+  yttUI(); yttWake();
+}
+function yttOnError(code) {
+  const msg = code === 153 || !/^https?:$/.test(location.protocol) ? 'Open humm.. from its web link to play YouTube'
+    : code === 101 || code === 150 ? 'This one can’t play inside other apps. Skipping'
+    : code === 100 ? 'This video isn’t available. Skipping' : 'This video couldn’t play. Skipping';
+  flash(msg);
+  if (code !== 153) yttAdvance('error');
+}
+/* only one phone moves to the next song: the "lead" right away, the other only if nothing happened */
+function yttAdvance(why) {
+  const idx = YTS.q.index, rev = YTS.q.rev;
+  clearTimeout(YTS.endT);
+  YTS.endT = setTimeout(() => {
+    if (YTS.q.index !== idx || YTS.q.rev !== rev) return;
+    yttCommit(s => { if (s.index + 1 < s.queue.length) { s.index++; s.pos = 0; s.playing = true; } else { s.playing = false; s.pos = 0; } });
+  }, yttLead() ? 150 : 1600);
+}
+/* every second: stay in step with the shared position */
+setInterval(() => {
+  const q = YTS.q;
+  if (!YTS.ready || !yttCur() || document.hidden) return;
+  yttUI(true);
+  if (yttState() === 1 && S.yttTap) { S.yttTap = false; yttHost.classList.remove('need-tap'); }
+  if (!q.playing || yttState() !== 1 || YTS.loadedId !== yttCur().id) return;
+  const diff = yttTime() - yttExpected(), now = Date.now();
+  if (Math.abs(diff) > 0.8 && now - YTS.lastSeek > 3000) { YTS.player.seekTo(yttExpected(), true); YTS.lastSeek = now; }
+  else if (Math.abs(diff) > 0.25 && !YTS.rateT) {
+    const rates = (YTS.player.getAvailablePlaybackRates && YTS.player.getAvailablePlaybackRates()) || [];
+    const r = diff > 0 ? 0.95 : 1.05;
+    if (rates.includes(r) || rates.includes(diff > 0 ? 0.75 : 1.25)) {
+      try { YTS.player.setPlaybackRate(rates.includes(r) ? r : (diff > 0 ? 0.75 : 1.25)); } catch (e) {}
+      YTS.rateT = setTimeout(() => { try { YTS.player.setPlaybackRate(1); } catch (e) {} YTS.rateT = null; }, rates.includes(r) ? 2200 : 700);
+    }
+  }
+}, 1000);
+
+/* ---------- shared actions ---------- */
+function yttCommit(mutate) {
+  const s = JSON.parse(JSON.stringify(YTS.q));
+  s.pos = yttExpected(); s.t0 = Date.now();
+  mutate(s);
+  s.index = Math.max(0, Math.min(s.index, Math.max(0, s.queue.length - 1)));
+  if (!s.queue.length) { s.playing = false; s.pos = 0; }
+  s.rev = (YTS.q.rev || 0) + 1; s.by = uid() || 'me';
+  YTS.q = s; YTS.stale = false; yttSave();
+  bcast('ytt', { k: 'state', s, sentAt: Date.now() });
+  if (s.playing) pushPartner('listening', {}, 20 * 60 * 1000);
+  yttApply(); render();
+}
+function yttToggle() {
+  if (!yttCur()) return;
+  const play = !YTS.q.playing;
+  if (play && YTS.ready) { yttExpect(1); try { YTS.player.playVideo(); } catch (e) {} }   // start inside the tap, so the phone allows sound
+  yttCommit(s => { s.playing = play; if (play && yttDur() && s.pos >= yttDur() - 1) s.pos = 0; });
+}
+function yttSeek(sec) { if (yttCur()) yttCommit(s => { s.pos = Math.max(0, sec); }); }
+function yttNext() { if (YTS.q.index + 1 < YTS.q.queue.length) yttCommit(s => { s.index++; s.pos = 0; s.playing = true; }); }
+function yttPrev() { yttCommit(s => { if (yttExpected() > 3 || s.index === 0) s.pos = 0; else { s.index--; s.pos = 0; } s.playing = true; }); }
+function yttPlayAt(i) { if (YTS.q.queue[i]) { if (YTS.ready) { try { YTS.player.playVideo(); } catch (e) {} } yttCommit(s => { s.index = i; s.pos = 0; s.playing = true; }); } }
+function yttRemove(i) {
+  yttCommit(s => {
+    if (!s.queue[i]) return;
+    const wasCur = i === s.index; s.queue.splice(i, 1);
+    if (i < s.index) s.index--; else if (wasCur) { s.pos = 0; if (s.index >= s.queue.length) { s.index = Math.max(0, s.queue.length - 1); s.playing = false; } }
+  });
+}
+function yttAdd(item, mode) {
+  const it = Object.assign({ key: newId().slice(0, 8), by: uid() || 'me' }, item);
+  const empty = !YTS.q.queue.length;
+  if (YTS.ready && (mode === 'now' || empty)) { try { YTS.player.playVideo(); } catch (e) {} }
+  yttCommit(s => {
+    if (empty) { s.queue = [it]; s.index = 0; s.pos = 0; s.playing = true; return; }
+    if (mode === 'now') { s.queue.splice(s.index + 1, 0, it); s.index++; s.pos = 0; s.playing = true; }
+    else if (mode === 'next') s.queue.splice(s.index + 1, 0, it);
+    else s.queue.push(it);
+  });
+  flash(mode === 'now' || empty ? `Playing “${it.title}”` : mode === 'next' ? 'Plays next' : 'Added to your queue', true);
+}
+function yttMeta(id, title, author) {
+  let changed = false;
+  YTS.q.queue.forEach(it => { if (it.id === id && !it.titleOk) { it.title = title; it.artist = author || it.artist; it.titleOk = true; changed = true; } });
+  if (changed) { yttSave(); softRender(); }
+}
+
+/* ---------- search: a YouTube link always works; typed search needs the API key ---------- */
+async function yttSearch() {
+  const text = (S.yttQ || '').trim(); if (!text) return;
+  const id = yttIdFrom(text);
+  if (id) {
+    const it = { id, title: 'YouTube video', artist: '', thumb: yttThumb(id) };
+    try {
+      const r = await fetch('https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent('https://www.youtube.com/watch?v=' + id));
+      if (r.ok) { const j = await r.json(); it.title = j.title || it.title; it.artist = j.author_name || ''; it.titleOk = true; }
+    } catch (e) {}
+    YTS.results = [it]; YTS.searchMsg = ''; S.yttQ = ''; render(); return;
+  }
+  if (!YT_API_KEY) { YTS.results = []; YTS.searchMsg = 'Search turns on once a YouTube API key is added. For now, paste a YouTube link.'; render(); return; }
+  YTS.searching = true; YTS.searchMsg = ''; render();
+  try {
+    const u = 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&videoCategoryId=10&maxResults=15&safeSearch=moderate&q=' + encodeURIComponent(text) + '&key=' + encodeURIComponent(YT_API_KEY);
+    const r = await fetch(u), j = await r.json();
+    if (!r.ok) throw new Error((j.error && j.error.message) || 'search failed');
+    YTS.results = (j.items || []).filter(x => x.id && x.id.videoId).map(x => ({
+      id: x.id.videoId, title: yttDecode(x.snippet.title), artist: yttDecode(x.snippet.channelTitle).replace(/ - Topic$/, ''), thumb: (x.snippet.thumbnails && (x.snippet.thumbnails.medium || x.snippet.thumbnails.default) || {}).url || yttThumb(x.id.videoId), titleOk: true
+    }));
+    YTS.searchMsg = YTS.results.length ? '' : 'Nothing found. Try the song and singer’s name';
+  } catch (e) { YTS.results = []; YTS.searchMsg = /quota/i.test(e.message) ? 'YouTube search limit reached for today. Paste a link instead' : 'Search didn’t work. Check your connection'; }
+  YTS.searching = false; render();
+}
+
+/* ---------- talking to the other phone ---------- */
+function yttHello() { bcast('ytt', { k: 'hello', rev: YTS.q.rev, stale: YTS.stale }); yttPing(); }
+function yttPing() { bcast('ytt', { k: 'ping', t1: Date.now() }); }
+function onYttMsg(m) {
+  if (!m || !m.k) return;
+  if (m.k === 'ping') { bcast('ytt', { k: 'pong', t1: m.t1, t2: Date.now() }); return; }
+  if (m.k === 'pong') {   // learn the difference between the two phones' clocks (keep the fastest round trip)
+    const t3 = Date.now(), rtt = t3 - m.t1; if (rtt < 0 || rtt > 5000) return;
+    YTS.samples.push({ rtt, off: m.t2 - (m.t1 + t3) / 2 }); YTS.samples = YTS.samples.slice(-6);
+    YTS.offset = YTS.samples.reduce((a, b) => a.rtt <= b.rtt ? a : b).off; return;
+  }
+  if (m.k === 'hello') {
+    if (YTS.q.queue.length && !(YTS.stale && !m.stale && m.rev >= YTS.q.rev)) bcast('ytt', { k: 'state', s: YTS.q, sentAt: Date.now() });
+    yttPing(); return;
+  }
+  if (m.k === 'meta') { yttMeta(m.id, m.title, m.author); return; }
+  if (m.k === 'state' && m.s) {
+    const s = m.s, cur = YTS.q;
+    const newer = s.rev > cur.rev || (s.rev === cur.rev && String(s.by) > String(cur.by)) || (YTS.stale && s.rev >= cur.rev);
+    if (!newer) return;
+    const local = Object.assign({}, s);
+    if (YTS.offset != null) local.t0 = s.t0 - YTS.offset;                       // their clock -> my clock
+    else local.t0 = Date.now() - 150 - Math.max(0, (m.sentAt || s.t0) - s.t0);  // no clock reading yet: assume a short trip
+    const wasPlaying = cur.playing, wasId = yttCur() && yttCur().id;
+    YTS.q = local; YTS.stale = false; yttSave();
+    const nowId = yttCur() && yttCur().id;
+    if (local.playing && !S.yttOpen && (!wasPlaying || wasId !== nowId) && yttCur()) { S.yttInvite = { title: yttCur().title }; }
+    if (!local.playing) S.yttInvite = null;
+    if (YTS.player || S.yttOpen) yttApply(); else yttWake();
+    softRender();
+  }
+}
+
+/* ---------- keep the screen on while it plays ---------- */
+async function yttWake() {
+  const want = YTS.q.playing && !!yttCur() && !!YTS.player && !document.hidden;
+  try {
+    if (want && !YTS.wake && 'wakeLock' in navigator) { YTS.wake = await navigator.wakeLock.request('screen'); YTS.wake.addEventListener('release', () => { YTS.wake = null; }); }
+    if (!want && YTS.wake) { const w = YTS.wake; YTS.wake = null; await w.release(); }
+  } catch (e) { YTS.wake = null; }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { yttWake(); return; }
+  if (YTS.player || S.yttOpen) { yttHello(); setTimeout(yttApply, 300); }       // back on screen: catch up right away
+  yttWake();
+});
+window.addEventListener('online', () => { if (YTS.player || S.yttOpen) { yttHello(); setTimeout(yttApply, 500); } });
+setInterval(() => { if ((YTS.player || S.yttOpen) && !document.hidden) yttPing(); }, 30000);
+
+/* where the video sits: on its screen, as a small window while you browse, or tucked away when nothing plays */
+ytPlace = function () {
+  const slot = S.yttOpen && !onboarding() ? document.getElementById('yttSlot') : null;
+  const pip = !slot && !onboarding() && YTS.player && YTS.q.playing && !!yttCur();
+  yttHost.className = slot ? 'slot' : pip ? 'pip' : 'off';
+  if (slot) {
+    const r = slot.getBoundingClientRect();
+    Object.assign(yttHost.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+  } else if (pip) {
+    const ph = app.getBoundingClientRect(), anchor = app.querySelector('.mini') || app.querySelector('.dock');
+    const bottom = anchor ? anchor.getBoundingClientRect().top - 12 : ph.bottom - 120;
+    Object.assign(yttHost.style, { left: (ph.right - 214) + 'px', top: (bottom - 200) + 'px', width: '200px', height: '200px' });
+  } else Object.assign(yttHost.style, { left: '-10000px', top: '0px', width: '200px', height: '200px' });
+};
+window.addEventListener('resize', () => ytPlace());
+
+/* ---------- screens ---------- */
+const YTT_ICON = svg(20, '<rect x="3" y="6" width="18" height="12" rx="4"/><path d="m10 9.5 4.5 2.5-4.5 2.5z" fill="currentColor"/>', 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"');
+function yttCard() {
+  if (!paired()) return '';
+  const cur = yttCur();
+  return `<div class="px" style="margin-top:12px"><button class="press g-card" data-act="yttopen">
+    <span class="g-card-art" aria-hidden="true" style="color:#E0302B">${YTT_ICON}</span>
+    <span style="flex:1;min-width:0;text-align:left"><b>YouTube together <i class="ytt-beta">test</i></b><small class="ell">${cur && YTS.q.playing ? 'Playing · ' + esc(cur.title) : `Search a song and play it in sync with ${esc(P.name)}`}</small></span>
+    <span class="g-card-go">Open</span>
+  </button></div>`;
+}
+function yttInviteCard() {
+  if (!S.yttInvite || S.yttOpen) return '';
+  return `<div class="banner g-inv" role="status">
+    <span class="g-inv-ico" style="color:#E0302B">${YTT_ICON}</span>
+    <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">${esc(P.name)} is playing on YouTube</div><div class="muted ell" style="font-size:12px">${esc(S.yttInvite.title || '')}</div></div>
+    <button class="press join-btn" data-act="yttjoin">Join</button>
+    <button class="press" data-act="yttnojoin" aria-label="Not now" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#8A90A0">${I.x}</button>
+  </div>`;
+}
+function yttUI(light) {   // progress + times without redrawing the whole screen
+  const bar = app.querySelector('#yttSeek'); if (!bar) return;
+  const d = yttDur(), t = yttExpected();
+  if (!S.yttDragging) { bar.max = Math.max(1, Math.round(d)); bar.value = Math.min(Math.round(t), bar.max); bar.style.setProperty('--p', (d ? Math.min(100, t / d * 100) : 0) + '%'); }
+  const a = app.querySelector('[data-ytt-t]'), b = app.querySelector('[data-ytt-d]');
+  if (a && !S.yttDragging) a.textContent = yttFmt(t); if (b) b.textContent = d ? yttFmt(d) : '–:––';
+  if (!light) { const btn = app.querySelector('[data-act="ytttoggle"]'); if (btn) btn.innerHTML = YTS.q.playing ? I.pause(26) : I.play(26); }
+}
+function yttView() {
+  const q = YTS.q, cur = yttCur(), pm = typeof partnerMeta === 'function' ? partnerMeta() : null, here = !!(pm && pm.ytt);
+  const playIco = q.playing ? I.pause(26) : I.play(26);
+  const row = (it, i, kind) => `<div class="ytt-row ${kind === 'q' && i === q.index ? 'on' : ''}">
+      <button class="press ytt-row-main" data-act="${kind === 'q' ? 'yttplayat' : 'yttaddnow'}" data-i="${i}">
+        <span class="ytt-th"><img src="${esc(it.thumb || yttThumb(it.id))}" alt="" loading="lazy"></span>
+        <span class="ytt-tx"><b class="ell">${esc(it.title)}</b><small class="ell">${esc(it.artist || '')}${kind === 'q' && i === q.index ? ' · now playing' : ''}</small></span>
+      </button>
+      ${kind === 'q' ? `<button class="press ytt-mini" data-act="yttremove" data-i="${i}" aria-label="Remove">${I.x}</button>`
+        : `<button class="press ytt-mini" data-act="yttaddnext" data-i="${i}" aria-label="Play next" title="Play next">${svg(18, '<path d="M4 7h11M4 12h11M4 17h7"/><path d="M18 14v6M15 17h6"/>', 'fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"')}</button>
+           <button class="press ytt-mini" data-act="yttaddend" data-i="${i}" aria-label="Add to queue" title="Add to queue">${svg(18, '<path d="M12 5v14M5 12h14"/>', 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"')}</button>`}
+    </div>`;
+  return `<div class="overlay ytt ${OPENED.ytt ? 'sheetUp' : ''}">
+    <div class="ytt-top">
+      <button class="icon-btn press" data-act="yttclose" aria-label="Minimise">${I.chevD}</button>
+      <div class="ytt-status ${here ? 'live' : ''}"><span class="dot"></span>${here ? esc(P.name) + ' is here' : esc(P.name) + ' isn’t here yet'}</div>
+      <span class="ytt-beta big">test</span>
+    </div>
+    <div class="ytt-stage">
+      <div id="yttSlot" class="ytt-slot">${cur ? '' : `<div class="ytt-empty">${YTT_ICON}<span>Search or paste a YouTube link to start</span></div>`}</div>
+    </div>
+    <div class="ytt-now">
+      <div class="ytt-t ell">${cur ? esc(cur.title) : 'Nothing playing'}</div>
+      <div class="ytt-a ell">${cur ? esc(cur.artist || 'YouTube') : 'Both of you control the same player'}</div>
+      <input id="yttSeek" type="range" min="0" max="1" value="0" step="1" ${cur ? '' : 'disabled'} aria-label="Seek">
+      <div class="ytt-times"><span data-ytt-t>0:00</span><span data-ytt-d>–:––</span></div>
+      <div class="ytt-ctl">
+        <button class="press ses-ctl" data-act="yttprev" aria-label="Previous" ${cur ? '' : 'disabled'}>${I.prev(22)}</button>
+        <button class="press ses-play" data-act="ytttoggle" aria-label="${q.playing ? 'Pause' : 'Play'}" ${cur ? '' : 'disabled'}>${playIco}</button>
+        <button class="press ses-ctl" data-act="yttnext" aria-label="Next" ${q.index + 1 < q.queue.length ? '' : 'disabled'}>${I.next(22)}</button>
+      </div>
+    </div>
+    <div class="ytt-scroll">
+      <div class="ytt-search">${I.search(18)}
+        <input id="yttQ" type="search" placeholder="Search YouTube or paste a link" value="${esc(S.yttQ || '')}" autocomplete="off" enterkeyhint="search">
+        <button class="press" data-act="yttsearch" aria-label="Search">${YTS.searching ? '<span class="dlg-spin" style="border-color:rgba(0,0,0,.15);border-top-color:var(--accent)"></span>' : 'Go'}</button>
+      </div>
+      ${YTS.searchMsg ? `<p class="ytt-msg">${esc(YTS.searchMsg)}</p>` : ''}
+      ${YTS.results.length ? `<div class="ytt-h">Results <button class="press" data-act="yttclearres">Clear</button></div>${YTS.results.map((it, i) => row(it, i, 'r')).join('')}` : ''}
+      <div class="ytt-h">Queue <span>${q.queue.length}</span></div>
+      ${q.queue.length ? q.queue.map((it, i) => row(it, i, 'q')).join('') : `<p class="ytt-msg">Songs you add show up here for both of you.</p>`}
+    </div>
+  </div>`;
+}
+
 /* ---------- app updates: notice a new version on the server and offer a one-tap update ----------
    No version numbers to remember: we compare the app file on the server with the one that's running. */
 const UPD = { base: null, busy: false, seen: null };
-var BUILD = '2026-10-25T22:08:01+05:30';   // stamped every time a new version is made
+var BUILD = '2026-11-10T18:07:05+05:30';   // stamped every time a new version is made
 function buildLabel() { return (() => { const d = new Date(BUILD); return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }); })(); }
 async function appFingerprint() {
   const r = await fetch(location.pathname + '?u=' + Date.now(), { cache: 'no-store' });
@@ -4096,6 +5011,46 @@ function pushPartner(type, extra, gapMs) {
   pushLast[type] = Date.now();
   try { CLOUD.sb.functions.invoke('notify', { body: Object.assign({ type }, extra || {}) }).catch(() => {}); } catch (e) {}
 }
+/* ---------- links from other apps: ?listen=1, ?q=<song>, ?from=… (linking only, no new screens) ---------- */
+const LINK_KEYS = ['listen', 'add', 'mode', 'q', 'from'];
+let linkSeen = { k: '', t: 0 };
+function handleLinkParams(u) {
+  try { u = u instanceof URL ? u : new URL(String(u), location.href); } catch (e) { return; }
+  const p = u.searchParams, link = {};
+  if (p.get('listen') === '1') link.listen = 1;
+  if ((p.get('q') || '').trim()) link.q = p.get('q').trim().slice(0, 120);
+  // ?add= / &mode= : humm.. has no add-by-link feature, so they are ignored. ?from= is ignored too.
+  try {   // tidy the address bar so a refresh doesn't repeat it (other parameters such as ?join= are kept)
+    const here = new URL(location.href); let changed = false;
+    LINK_KEYS.forEach(k => { if (here.searchParams.has(k)) { here.searchParams.delete(k); changed = true; } });
+    if (changed) history.replaceState(history.state, '', here.pathname + here.search + here.hash);
+  } catch (e) {}
+  if (!link.listen && !link.q) return;
+  const k = JSON.stringify(link);
+  if (k === linkSeen.k && Date.now() - linkSeen.t < 4000) return;   // the same launch reported twice
+  linkSeen = { k, t: Date.now() };
+  try { sessionStorage.setItem('humm-link', k); } catch (e) { window.__hummLink = k; }
+  applyPendingLink();
+}
+function applyPendingLink() {
+  if (!window.__hummEntered || onboarding()) return;     // not signed in yet: kept until the app opens
+  let link = null;
+  try { link = JSON.parse(sessionStorage.getItem('humm-link') || window.__hummLink || 'null'); sessionStorage.removeItem('humm-link'); } catch (e) { try { link = JSON.parse(window.__hummLink || 'null'); } catch (x) {} }
+  window.__hummLink = null;
+  if (!link) return;
+  Object.assign(S, { showAll: false, profile: false, inviteSheet: false });
+  if (link.listen) {
+    if (S.session) S.overlay = 'session';
+    else if (paired() && S.partner && S.partner.status === 'listening' && S.partner.songId && ALL.includes(S.partner.songId)) { join(); return; }
+    else if (S.curId && ALL.includes(S.curId)) S.overlay = 'player';
+    else { S.overlay = null; S.tab = 'songs'; S.lib = 'songs'; S.openPl = null; }
+    render(); return;
+  }
+  if (link.q) { Object.assign(S, { overlay: null, tab: 'songs', lib: 'songs', openPl: null, searchOpen: true, query: link.q }); render(); }
+}
+handleLinkParams(new URL(location.href));
+if ('launchQueue' in window) window.launchQueue.setConsumer(p => { if (p && p.targetURL) handleLinkParams(new URL(p.targetURL)); });
+
 /* a tap on a notification opens the right screen */
 function openFromPing(what) {
   if (onboarding() || !what) return;
@@ -4113,7 +5068,7 @@ function openFromPing(what) {
 if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => { if (e.data && e.data.type === 'open') openFromPing(e.data.open); });
 
 /* hook the existing player: every local change is shared */
-const _play = play; play = function () { const r = _play.apply(this, arguments); trackMe(); sessionSync(); return r; };
+const _play = play; play = function () { if (typeof YTS !== 'undefined' && YTS.q.playing) yttCommit(s => { s.playing = false; }); const r = _play.apply(this, arguments); trackMe(); sessionSync(); return r; };
 const _invite = invite; invite = function () { _invite.apply(this, arguments); pushPartner('together', { song_id: S.curId }, 2 * 60 * 1000); bcast('session', { type: 'invite', song_id: S.curId, pos: S.progress, at: Date.now() }); trackMe(); };
 const _join = join; join = function () { S.sesLead = false; _join.apply(this, arguments); bcast('session', { type: 'join' }); trackMe(); };
 const _leave = leave; leave = function () { const was = S.session; _leave.apply(this, arguments); if (was) bcast('session', { type: 'leave' }); trackMe(); };
