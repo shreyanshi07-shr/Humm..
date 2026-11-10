@@ -1272,54 +1272,78 @@ html,body{overflow:hidden;overscroll-behavior:none}
 .g-final span{font-size:13px;color:var(--muted)}.g-final b{font-family:'Fraunces','Georgia',serif;font-size:30px;color:var(--ink)}
 .g-inv .g-inv-ico{width:42px;height:42px;border-radius:12px;background:#F3F3F6;display:flex;align-items:center;justify-content:center;color:#17181D;flex-shrink:0}
 @media (prefers-reduced-motion:reduce){.g-scrib,.g-dots i,.g-clock.low,.g-opt,.g-rv-card{animation:none!important}.g-scrib{stroke-dashoffset:0}}
-/* ---------- YouTube together (test) ---------- */
-.ytt-beta{font-style:normal;font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:#E0302B;background:#FDECEC;border-radius:6px;padding:2px 5px;margin-left:4px;vertical-align:2px}
-.ytt-beta.big{justify-self:end;margin-right:6px}
+/* ---------- Listen online together ---------- */
+.ytt-card-art{color:var(--accent)!important}
 .overlay.ytt{z-index:44;background:#fff!important;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 0 0;overflow:hidden}
-.ytt-top{display:grid;grid-template-columns:44px 1fr auto;align-items:center;padding:0 10px;color:var(--ink)}
-.ytt-status{justify-self:center;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--muted)}
+.ytt-top{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;padding:0 10px;color:var(--ink)}
+.ytt-head{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0}
+.ytt-title{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted)}
+.ytt-status{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
 .ytt-status .dot{width:7px;height:7px;border-radius:50%;background:#C5CAD6}
 .ytt-status.live{color:#1E7A4D}.ytt-status.live .dot{background:#2EAA6E;animation:pulse 1.8s ease-out infinite}
-.ytt-stage{position:relative;margin:10px 16px 0}
-.ytt-slot{width:100%;aspect-ratio:16/9;min-height:200px;border-radius:18px;background:#0E0F12;overflow:hidden}
-.ytt-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#9AA0AE;font-size:13px;text-align:center;padding:0 30px}
-.ytt-empty svg{width:34px;height:34px;color:#E0302B}
-.ytt-tap{display:none;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;white-space:nowrap;height:50px;padding:0 20px;border-radius:999px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;align-items:center;gap:8px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.ytt-stage{position:relative;margin:12px 16px 0}
+.ytt-slot{position:relative;width:100%;aspect-ratio:16/9;min-height:200px;border-radius:22px;background:#F3F3F6;overflow:hidden}
+.ytt-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;padding:0 34px;color:var(--muted);font-size:13px;line-height:1.45}
+.ytt-empty b{font-size:15px;color:var(--ink)}
+.ytt-empty-ico{width:46px;height:46px;border-radius:50%;background:#fff;color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:4px;box-shadow:0 6px 16px rgba(20,24,40,.08)}
+.ytt-art{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.ytt-art-bg{position:absolute;inset:-20px;background-size:cover;background-position:center;filter:blur(24px) saturate(1.2);opacity:.55;transform:scale(1.1)}
+.ytt-art-img{position:relative;height:74%;aspect-ratio:1;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 18px 40px rgba(15,17,24,.28);display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.ytt-art-img img{width:100%;height:100%;object-fit:cover;display:block}
+.ytt-au-tap,.ytt-tap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;white-space:nowrap;height:50px;padding:0 22px;border-radius:999px;background:var(--accent);color:#fff;font-size:15px;font-weight:700;align-items:center;gap:8px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.ytt-au-tap{display:flex}
+.ytt-tap{display:none}
 #yttHost{position:fixed;z-index:46;overflow:hidden;background:#000}
-#yttHost.slot{border-radius:18px}
+#yttHost.slot{border-radius:22px}
 #yttHost.pip{z-index:40;border-radius:16px;box-shadow:0 14px 34px rgba(15,17,24,.35);overflow:visible}
 #yttHost.off{pointer-events:none;opacity:0}
 #yttHost iframe,#yttFrame{width:100%;height:100%;display:block;border:0;border-radius:inherit}
 .ytt-expand{display:none}
 #yttHost.need-tap:not(.off) .ytt-tap{display:flex}
 #yttHost.pip .ytt-expand{display:block;position:absolute;left:0;right:0;bottom:100%;margin-bottom:6px;height:28px;border-radius:999px;background:var(--ink);color:#fff;font-size:12px;font-weight:600}
-.ytt-now{padding:12px 20px 0;text-align:center}
-.ytt-t{font-family:'Fraunces','Georgia',serif;font-weight:600;font-size:20px;color:var(--ink)}
-.ytt-a{margin-top:2px;font-size:13.5px;color:var(--muted)}
-#yttSeek{-webkit-appearance:none;appearance:none;width:100%;height:4px;margin:14px 0 0;border-radius:2px;background:linear-gradient(to right,var(--accent) var(--p,0%),#ECEDF1 var(--p,0%));outline:none}
+.ytt-now{padding:14px 22px 0;text-align:center}
+.ytt-t{font-family:'Fraunces','Georgia',serif;font-weight:600;font-size:21px;letter-spacing:-.01em;color:var(--ink)}
+.ytt-a{margin-top:5px;font-size:13.5px;color:var(--muted);display:flex;align-items:center;justify-content:center;min-width:0}
+.ytt-src{display:inline-flex;align-items:center;height:18px;padding:0 6px;border-radius:5px;font-size:10.5px;font-weight:700;letter-spacing:.02em;margin-right:6px;flex-shrink:0}
+.ytt-src.au{background:var(--accent-soft);color:var(--accent)}
+.ytt-src.yt{background:#FDECEC;color:#C8302B}
+#yttSeek{-webkit-appearance:none;appearance:none;width:100%;height:4px;margin:16px 0 0;border-radius:2px;background:linear-gradient(to right,var(--accent) var(--p,0%),#ECEDF1 var(--p,0%));outline:none}
 #yttSeek::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);box-shadow:0 2px 6px rgba(0,0,0,.2)}
 #yttSeek::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--accent)}
-.ytt-times{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--muted)}
-.ytt-ctl{display:flex;align-items:center;justify-content:center;gap:26px;margin-top:6px}
+#yttSeek[disabled]{opacity:.5}
+.ytt-times{display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ytt-ctl{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:4px}
 .ytt-ctl button[disabled]{opacity:.35}
-.ytt-scroll{flex:1;overflow-y:auto;margin-top:10px;padding:0 16px calc(20px + env(safe-area-inset-bottom));border-top:1px solid #F0F0F3;scrollbar-width:none}
-.ytt-search{display:flex;align-items:center;gap:8px;height:48px;margin-top:14px;padding:0 6px 0 14px;border-radius:999px;background:#F3F3F6;color:#8A90A0}
+.ytt-scroll{flex:1;overflow-y:auto;margin-top:12px;padding:0 16px calc(24px + env(safe-area-inset-bottom));border-top:1px solid #F0F0F3;scrollbar-width:none}
+.ytt-scroll::-webkit-scrollbar{display:none}
+.ytt-search{display:flex;align-items:center;gap:8px;height:50px;margin-top:14px;padding:0 6px 0 16px;border-radius:999px;background:#F3F3F6;color:#8A90A0}
 .ytt-search input{flex:1;min-width:0;border:0;outline:none;background:transparent;font-size:15px;color:var(--ink)}
-.ytt-search button{height:36px;min-width:46px;padding:0 12px;border-radius:999px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ytt-search input::-webkit-search-cancel-button{display:none}
+.ytt-search button{height:38px;min-width:76px;padding:0 14px;border-radius:999px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ytt-ideas{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ytt-ideas button{height:34px;padding:0 14px;border-radius:999px;background:#fff;border:1px solid #E6E7EC;color:var(--ink);font-size:13px;font-weight:600}
 .ytt-msg{margin:12px 4px 0;font-size:13px;line-height:1.5;color:var(--muted)}
-.ytt-h{display:flex;align-items:center;gap:8px;margin:18px 4px 6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A90A0}
-.ytt-h span{font-weight:600;letter-spacing:0}
+.ytt-h{display:flex;align-items:center;gap:8px;margin:20px 4px 4px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8A90A0}
+.ytt-h span{font-weight:600;letter-spacing:0;text-transform:none}
 .ytt-h button{margin-left:auto;font-size:12px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--accent)}
-.ytt-row{display:flex;align-items:center;gap:4px;padding:6px 0;border-radius:14px}
+.ytt-sub{margin:10px 4px 2px;font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+.ytt-row{display:flex;align-items:center;gap:2px;padding:6px 0}
 .ytt-row.on .ytt-tx b{color:var(--accent)}
 .ytt-row-main{flex:1;min-width:0;display:flex;align-items:center;gap:12px;text-align:left}
-.ytt-th{width:72px;height:41px;border-radius:9px;overflow:hidden;background:#ECEDF1;flex-shrink:0}
+.ytt-th{position:relative;width:72px;height:44px;border-radius:10px;overflow:hidden;background:#ECEDF1;flex-shrink:0}
+.ytt-th.sq{width:44px}
 .ytt-th img{width:100%;height:100%;object-fit:cover;display:block}
-.ytt-tx{min-width:0;display:flex;flex-direction:column;gap:2px}
+.ytt-eq{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;justify-content:center;gap:3px;padding-bottom:12px}
+.ytt-eq b{width:3px;height:14px;border-radius:2px;background:#fff;animation:yttEq .9s ease-in-out infinite}
+.ytt-eq b:nth-child(2){animation-delay:.2s}.ytt-eq b:nth-child(3){animation-delay:.4s}
+@keyframes yttEq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+.ytt-tx{min-width:0;display:flex;flex-direction:column;gap:3px}
 .ytt-tx b{font-size:14px;font-weight:600;color:var(--ink)}
-.ytt-tx small{font-size:12px;color:var(--muted)}
+.ytt-tx small{font-size:12px;color:var(--muted);display:flex;align-items:center;min-width:0}
 .ytt-mini{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#8A90A0;flex-shrink:0}
 .ytt-mini:active{background:#F3F3F6}
+.ytt-credit{margin:22px 0 0;text-align:center;font-size:11px;color:#A3A9B6}
+@media (prefers-reduced-motion:reduce){.ytt-eq b{animation:none}}
 .pg-val.muted{color:var(--muted);font-weight:500;font-size:13px}
 .react-layer{position:absolute;left:0;right:0;bottom:120px;height:260px;pointer-events:none;z-index:75}
 .pg-val{font-weight:600;color:var(--accent);font-size:14px}
@@ -3422,6 +3446,7 @@ app.addEventListener('click', e => {
     case 'yttnext': yttNext(); break;
     case 'ytttap': S.yttTap = false; if (YTS.player) { yttExpect(1); try { YTS.player.playVideo(); } catch (e) {} } render(); setTimeout(yttApply, 400); break;
     case 'yttsearch': yttSearch(); break;
+    case 'yttidea': yttSearch(d.q); break;
     case 'yttclearres': YTS.results = []; YTS.searchMsg = ''; render(); break;
     case 'yttplayat': yttPlayAt(+d.i); break;
     case 'yttremove': yttRemove(+d.i); break;
@@ -4558,7 +4583,6 @@ function gSimDraw() {      // the pretend partner's turn to draw
    - Shared state: { queue, index, playing, pos, t0, rev, by }. Every control sends the whole state;
      the newest revision wins, and each phone corrects itself to the expected position.
    ===================================================================== */
-const YT_API_KEY = '';   // paste a YouTube Data API v3 key here to turn on search (restrict it to your site in Google Cloud)
 const YTT_KEY = 'humm-ytt';
 const YTS = {
   q: { queue: [], index: 0, playing: false, pos: 0, t0: 0, rev: 0, by: '' },
@@ -4594,25 +4618,104 @@ yttHost.querySelector('[data-ytt-tap]').addEventListener('click', () => {   // t
   if (YTS.player) { yttExpect(1); try { YTS.player.playVideo(); } catch (e) {} }
   setTimeout(yttApply, 400);
 });
-function yttEnsurePlayer() {
-  if (YTS.player) return;
-  if (!/^https?:$/.test(location.protocol) && !(window.YT && window.YT.Player)) { flash('Open humm.. from its web link to play YouTube'); return; }
-  if (window.YT && window.YT.Player) return yttCreate();
-  if (YTS.apiLoading) return; YTS.apiLoading = true;
-  const prev = window.onYouTubeIframeAPIReady;
-  window.onYouTubeIframeAPIReady = () => { if (prev) try { prev(); } catch (e) {} yttCreate(); };
-  const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api';
-  s.onerror = () => { YTS.apiLoading = false; flash('YouTube couldn’t load. Check your connection'); };
-  document.head.appendChild(s);
+/* One player, two sources. Items whose id starts with "au:" are free full songs from Audius, played by an
+   <audio> element (they keep playing with the screen off). Everything else is a YouTube video in the visible player. */
+const AU_STREAM = id => `https://api.audius.co/v1/tracks/${encodeURIComponent(id.slice(3))}/stream?app_name=humm`;
+const isAu = id => typeof id === 'string' && id.startsWith('au:');
+const YTF = {
+  mode: null, yt: null, ytReady: false, ytQueue: [], au: new Audio(), auState: -1,
+  ensureYT(then) {
+    if (this.ytReady) return then && then();
+    if (then) this.ytQueue.push(then);
+    if (this.yt || this._loading) return;
+    if (!/^https?:$/.test(location.protocol) && !(window.YT && window.YT.Player)) { flash('Open humm.. from its web link to play YouTube'); return; }
+    const make = () => {
+      if (this.yt) return;
+      this.yt = new YT.Player('yttFrame', {
+        width: '100%', height: '100%', host: 'https://www.youtube-nocookie.com',
+        playerVars: { playsinline: 1, controls: 0, disablekb: 1, rel: 0, modestbranding: 1, iv_load_policy: 3, fs: 0, origin: /^https?:/.test(location.protocol) ? location.origin : undefined },
+        events: {
+          onReady: () => { this.ytReady = true; const q = this.ytQueue.splice(0); q.forEach(f => { try { f(); } catch (e) {} }); },
+          onStateChange: e => { if (this.mode === 'yt') yttOnState(e.data); },
+          onError: e => { if (this.mode === 'yt') yttOnError(e.data); }
+        }
+      });
+    };
+    if (window.YT && window.YT.Player) return make();
+    this._loading = true;
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { if (prev) try { prev(); } catch (e) {} make(); };
+    const sc = document.createElement('script'); sc.src = 'https://www.youtube.com/iframe_api';
+    sc.onerror = () => { this._loading = false; flash('YouTube couldn’t load. Check your connection'); };
+    document.head.appendChild(sc);
+  },
+  setMode(m) {
+    if (this.mode === m) return;
+    if (m === 'au' && this.ytReady) { try { this.yt.pauseVideo(); } catch (e) {} }
+    if (m === 'yt') { try { this.au.pause(); } catch (e) {} }
+    this.mode = m; ytPlace();
+  },
+  auLoad(id, at, play) {
+    const a = this.au; a.preload = 'auto';
+    if (a.dataset.id !== id) { a.dataset.id = id; a.src = AU_STREAM(id); this.auState = play ? 3 : 5; }
+    const seek = () => { try { a.currentTime = at || 0; } catch (e) {} };
+    if (a.readyState >= 1) seek(); else a.addEventListener('loadedmetadata', seek, { once: true });
+    if (play) this.auPlay(); else { this.auState = 5; yttOnState(5); }
+  },
+  auPlay() {
+    this.au.play().catch(err => {
+      this.auState = -1;
+      if (err && err.name === 'NotAllowedError' && YTS.q.playing) { S.yttTap = true; yttHost.classList.add('need-tap'); yttShowAuTap(); }
+    });
+  },
+  loadVideoById(o) { const id = o.videoId; if (isAu(id)) { this.setMode('au'); this.auLoad(id, o.startSeconds, true); } else { this.setMode('yt'); this.ensureYT(() => this.yt.loadVideoById(o)); } },
+  cueVideoById(o) { const id = o.videoId; if (isAu(id)) { this.setMode('au'); this.auLoad(id, o.startSeconds, false); } else { this.setMode('yt'); this.ensureYT(() => this.yt.cueVideoById(o)); } },
+  playVideo() { if (this.mode === 'au') this.auPlay(); else if (this.ytReady) this.yt.playVideo(); },
+  pauseVideo() { if (this.mode === 'au') this.au.pause(); else if (this.ytReady) this.yt.pauseVideo(); },
+  stopVideo() { try { this.au.pause(); } catch (e) {} if (this.ytReady) { try { this.yt.stopVideo(); } catch (e) {} } },
+  seekTo(t) { if (this.mode === 'au') { try { this.au.currentTime = t; } catch (e) {} } else if (this.ytReady) this.yt.seekTo(t, true); },
+  getCurrentTime() { return this.mode === 'au' ? (this.au.currentTime || 0) : (this.ytReady && this.yt.getCurrentTime ? this.yt.getCurrentTime() || 0 : 0); },
+  getDuration() { return this.mode === 'au' ? (isFinite(this.au.duration) ? this.au.duration : 0) : (this.ytReady && this.yt.getDuration ? this.yt.getDuration() || 0 : 0); },
+  getPlayerState() { return this.mode === 'au' ? this.auState : (this.ytReady && this.yt.getPlayerState ? this.yt.getPlayerState() : -1); },
+  getAvailablePlaybackRates() { return this.mode === 'au' ? [0.75, 0.95, 1, 1.05, 1.25] : (this.ytReady && this.yt.getAvailablePlaybackRates ? this.yt.getAvailablePlaybackRates() : [1]); },
+  setPlaybackRate(r) { if (this.mode === 'au') this.au.playbackRate = r; else if (this.ytReady) this.yt.setPlaybackRate(r); },
+  getVideoData() {
+    if (this.mode === 'au') { const c = yttCur() || {}; return { video_id: c.id, title: c.title, author: c.artist }; }
+    return this.ytReady && this.yt.getVideoData ? this.yt.getVideoData() : null;
+  }
+};
+['playing', 'pause', 'waiting', 'ended', 'error'].forEach(ev => YTF.au.addEventListener(ev, () => {
+  if (YTF.mode !== 'au') return;
+  if (ev === 'error') { YTF.auState = -1; if (YTF.au.getAttribute('src')) yttOnError(100); return; }
+  if (ev === 'pause' && YTF.au.ended) return;            // 'ended' reports it
+  const st = ev === 'playing' ? 1 : ev === 'waiting' ? 3 : ev === 'ended' ? 0 : 2;
+  YTF.auState = st; yttOnState(st); yttMediaSession();
+}));
+/* free songs have no video, so the "tap to join" button sits on the artwork instead */
+function yttShowAuTap() {
+  softRender();
+  setTimeout(() => {
+    const st = app.querySelector('.ytt-art'); if (!st || st.querySelector('.ytt-au-tap')) return;
+    const b = document.createElement('button'); b.className = 'press ytt-au-tap'; b.textContent = 'Tap to join the music';
+    b.onclick = () => { S.yttTap = false; yttHost.classList.remove('need-tap'); b.remove(); yttExpect(1); YTF.auPlay(); setTimeout(yttApply, 400); };
+    st.appendChild(b);
+  }, 60);
 }
-function yttCreate() {
-  if (YTS.player) return;
-  YTS.player = new YT.Player('yttFrame', {
-    width: '100%', height: '100%', host: 'https://www.youtube-nocookie.com',
-    playerVars: { playsinline: 1, controls: 0, disablekb: 1, rel: 0, modestbranding: 1, iv_load_policy: 3, fs: 0, origin: /^https?:/.test(location.protocol) ? location.origin : undefined },
-    events: { onReady: () => { YTS.ready = true; yttApply(); }, onStateChange: e => yttOnState(e.data), onError: e => yttOnError(e.data) }
-  });
+/* lock screen controls for free songs: they control the shared player, so both phones follow */
+function yttMediaSession() {
+  if (!('mediaSession' in navigator) || YTF.mode !== 'au') return;
+  const c = yttCur(); if (!c) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({ title: c.title, artist: c.artist || '', album: 'humm.. · together', artwork: c.thumb ? [{ src: c.thumb, sizes: '480x480', type: 'image/jpeg' }] : [] });
+    navigator.mediaSession.playbackState = YTS.q.playing ? 'playing' : 'paused';
+    navigator.mediaSession.setActionHandler('play', () => { if (!YTS.q.playing) yttToggle(); });
+    navigator.mediaSession.setActionHandler('pause', () => { if (YTS.q.playing) yttToggle(); });
+    navigator.mediaSession.setActionHandler('nexttrack', () => yttNext());
+    navigator.mediaSession.setActionHandler('previoustrack', () => yttPrev());
+    navigator.mediaSession.setActionHandler('seekto', d => { if (d && d.seekTime != null) yttSeek(d.seekTime); });
+  } catch (e) {}
 }
+function yttEnsurePlayer() { if (!YTS.player) { YTS.player = YTF; YTS.ready = true; } }
 const yttState = () => { try { return YTS.player && YTS.player.getPlayerState ? YTS.player.getPlayerState() : -1; } catch (e) { return -1; } };
 const yttTime = () => { try { return YTS.player && YTS.player.getCurrentTime ? (YTS.player.getCurrentTime() || 0) : 0; } catch (e) { return 0; } };
 const yttDur = () => { try { return (YTS.player && YTS.player.getDuration && YTS.player.getDuration()) || (yttCur() && yttCur().secs) || 0; } catch (e) { return 0; } };
@@ -4624,18 +4727,20 @@ function yttApply() {
   const q = YTS.q, cur = yttCur(), p = YTS.player;
   yttWake(); ytPlace();
   if (!cur) { if (p && YTS.ready && YTS.loadedId) { try { p.stopVideo(); } catch (e) {} YTS.loadedId = null; } return; }
-  if (!YTS.ready) { if (q.playing || S.yttOpen) yttEnsurePlayer(); return; }
+  if (!YTS.ready) { if (q.playing || S.yttOpen || cur) yttEnsurePlayer(); if (!YTS.ready) return; }
+  const p2 = YTS.player;
   const want = yttExpected();
   if (YTS.loadedId !== cur.id) {
     YTS.loadedId = cur.id; YTS.lastLoad = Date.now();
-    if (q.playing) { yttExpect(1); p.loadVideoById({ videoId: cur.id, startSeconds: want }); yttCheckAutoplay(); }
-    else { yttExpect(5); p.cueVideoById({ videoId: cur.id, startSeconds: want }); }
+    if (q.playing) { yttExpect(1); p2.loadVideoById({ videoId: cur.id, startSeconds: want }); yttCheckAutoplay(); }
+    else { yttExpect(5); p2.cueVideoById({ videoId: cur.id, startSeconds: want }); }
     return;
   }
   const st = yttState();
-  if (q.playing && st !== 1 && st !== 3) { yttExpect(1); p.playVideo(); yttCheckAutoplay(); }
-  if (!q.playing && (st === 1 || st === 3)) { yttExpect(2); p.pauseVideo(); }
-  if (Math.abs(yttTime() - want) > 0.75) { p.seekTo(want, true); YTS.lastSeek = Date.now(); }
+  if (q.playing && st !== 1 && st !== 3) { yttExpect(1); p2.playVideo(); yttCheckAutoplay(); }
+  if (!q.playing && (st === 1 || st === 3)) { yttExpect(2); p2.pauseVideo(); }
+  if (Math.abs(yttTime() - want) > 0.75) { p2.seekTo(want, true); YTS.lastSeek = Date.now(); }
+  yttMediaSession();
 }
 function yttCheckAutoplay() {
   setTimeout(() => {
@@ -4659,7 +4764,8 @@ function yttOnState(st) {
   yttUI(); yttWake();
 }
 function yttOnError(code) {
-  const msg = code === 153 || !/^https?:$/.test(location.protocol) ? 'Open humm.. from its web link to play YouTube'
+  const msg = YTF.mode === 'au' ? 'This song couldn’t play. Skipping'
+    : code === 153 || !/^https?:$/.test(location.protocol) ? 'Open humm.. from its web link to play YouTube'
     : code === 101 || code === 150 ? 'This one can’t play inside other apps. Skipping'
     : code === 100 ? 'This video isn’t available. Skipping' : 'This video couldn’t play. Skipping';
   flash(msg);
@@ -4742,8 +4848,8 @@ function yttMeta(id, title, author) {
 }
 
 /* ---------- search: a YouTube link always works; typed search needs the API key ---------- */
-async function yttSearch() {
-  const text = (S.yttQ || '').trim(); if (!text) return;
+async function yttSearch(text) {
+  text = (text != null ? text : (S.yttQ || '')).trim(); if (!text) return;
   const id = yttIdFrom(text);
   if (id) {
     const it = { id, title: 'YouTube video', artist: '', thumb: yttThumb(id) };
@@ -4753,17 +4859,18 @@ async function yttSearch() {
     } catch (e) {}
     YTS.results = [it]; YTS.searchMsg = ''; S.yttQ = ''; render(); return;
   }
-  if (!YT_API_KEY) { YTS.results = []; YTS.searchMsg = 'Search turns on once a YouTube API key is added. For now, paste a YouTube link.'; render(); return; }
-  YTS.searching = true; YTS.searchMsg = ''; render();
+  YTS.searching = true; YTS.searchMsg = ''; S.yttQ = text; render();
   try {
-    const u = 'https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoEmbeddable=true&videoCategoryId=10&maxResults=15&safeSearch=moderate&q=' + encodeURIComponent(text) + '&key=' + encodeURIComponent(YT_API_KEY);
-    const r = await fetch(u), j = await r.json();
-    if (!r.ok) throw new Error((j.error && j.error.message) || 'search failed');
-    YTS.results = (j.items || []).filter(x => x.id && x.id.videoId).map(x => ({
-      id: x.id.videoId, title: yttDecode(x.snippet.title), artist: yttDecode(x.snippet.channelTitle).replace(/ - Topic$/, ''), thumb: (x.snippet.thumbnails && (x.snippet.thumbnails.medium || x.snippet.thumbnails.default) || {}).url || yttThumb(x.id.videoId), titleOk: true
-    }));
-    YTS.searchMsg = YTS.results.length ? '' : 'Nothing found. Try the song and singer’s name';
-  } catch (e) { YTS.results = []; YTS.searchMsg = /quota/i.test(e.message) ? 'YouTube search limit reached for today. Paste a link instead' : 'Search didn’t work. Check your connection'; }
+    if (!/^https?:$/.test(location.protocol)) throw new Error('offline-file');
+    const r = await fetch('/api/search?q=' + encodeURIComponent(text));
+    if (!r.ok) throw new Error('search ' + r.status);
+    const j = await r.json();
+    YTS.results = (j.results || []).map(x => Object.assign({ titleOk: true }, x));
+    YTS.searchMsg = YTS.results.length ? '' : 'Nothing found. Try the song or singer’s name';
+  } catch (e) {
+    YTS.results = [];
+    YTS.searchMsg = e.message === 'offline-file' ? 'Search works on humm-amber.vercel.app. Here you can paste a YouTube link' : 'Search didn’t work. Check your connection';
+  }
   YTS.searching = false; render();
 }
 
@@ -4802,7 +4909,7 @@ function onYttMsg(m) {
 
 /* ---------- keep the screen on while it plays ---------- */
 async function yttWake() {
-  const want = YTS.q.playing && !!yttCur() && !!YTS.player && !document.hidden;
+  const want = YTS.q.playing && !!yttCur() && !isAu(yttCur().id) && !!YTS.player && !document.hidden;
   try {
     if (want && !YTS.wake && 'wakeLock' in navigator) { YTS.wake = await navigator.wakeLock.request('screen'); YTS.wake.addEventListener('release', () => { YTS.wake = null; }); }
     if (!want && YTS.wake) { const w = YTS.wake; YTS.wake = null; await w.release(); }
@@ -4818,8 +4925,9 @@ setInterval(() => { if ((YTS.player || S.yttOpen) && !document.hidden) yttPing()
 
 /* where the video sits: on its screen, as a small window while you browse, or tucked away when nothing plays */
 ytPlace = function () {
-  const slot = S.yttOpen && !onboarding() ? document.getElementById('yttSlot') : null;
-  const pip = !slot && !onboarding() && YTS.player && YTS.q.playing && !!yttCur();
+  const vid = !!yttCur() && !isAu(yttCur().id) && YTF.mode === 'yt';
+  const slot = vid && S.yttOpen && !onboarding() ? document.getElementById('yttSlot') : null;
+  const pip = vid && !slot && !onboarding() && YTS.player && YTS.q.playing;
   yttHost.className = slot ? 'slot' : pip ? 'pip' : 'off';
   if (slot) {
     const r = slot.getBoundingClientRect();
@@ -4834,20 +4942,23 @@ window.addEventListener('resize', () => ytPlace());
 
 /* ---------- screens ---------- */
 const YTT_ICON = svg(20, '<rect x="3" y="6" width="18" height="12" rx="4"/><path d="m10 9.5 4.5 2.5-4.5 2.5z" fill="currentColor"/>', 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"');
+const YTT_NOTE = svg(20, '<path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>', 'fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"');
+const YTT_IDEAS = ['Arijit Singh', 'Lofi', 'Acoustic covers', 'Old Bollywood', 'Sufi', 'Piano'];
+function yttSrcTag(it) { return isAu(it.id) ? '<span class="ytt-src au">free</span>' : '<span class="ytt-src yt">YouTube</span>'; }
 function yttCard() {
   if (!paired()) return '';
   const cur = yttCur();
   return `<div class="px" style="margin-top:12px"><button class="press g-card" data-act="yttopen">
-    <span class="g-card-art" aria-hidden="true" style="color:#E0302B">${YTT_ICON}</span>
-    <span style="flex:1;min-width:0;text-align:left"><b>YouTube together <i class="ytt-beta">test</i></b><small class="ell">${cur && YTS.q.playing ? 'Playing · ' + esc(cur.title) : `Search a song and play it in sync with ${esc(P.name)}`}</small></span>
+    <span class="g-card-art ytt-card-art" aria-hidden="true">${YTT_NOTE}</span>
+    <span style="flex:1;min-width:0;text-align:left"><b>Listen online together</b><small class="ell">${cur && YTS.q.playing ? 'Playing · ' + esc(cur.title) : `Search any song and play it in sync with ${esc(P.name)}`}</small></span>
     <span class="g-card-go">Open</span>
   </button></div>`;
 }
 function yttInviteCard() {
   if (!S.yttInvite || S.yttOpen) return '';
   return `<div class="banner g-inv" role="status">
-    <span class="g-inv-ico" style="color:#E0302B">${YTT_ICON}</span>
-    <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">${esc(P.name)} is playing on YouTube</div><div class="muted ell" style="font-size:12px">${esc(S.yttInvite.title || '')}</div></div>
+    <span class="g-inv-ico ytt-card-art">${YTT_NOTE}</span>
+    <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700">${esc(P.name)} is playing a song</div><div class="muted ell" style="font-size:12px">${esc(S.yttInvite.title || '')}</div></div>
     <button class="press join-btn" data-act="yttjoin">Join</button>
     <button class="press" data-act="yttnojoin" aria-label="Not now" style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#8A90A0">${I.x}</button>
   </div>`;
@@ -4865,25 +4976,26 @@ function yttView() {
   const playIco = q.playing ? I.pause(26) : I.play(26);
   const row = (it, i, kind) => `<div class="ytt-row ${kind === 'q' && i === q.index ? 'on' : ''}">
       <button class="press ytt-row-main" data-act="${kind === 'q' ? 'yttplayat' : 'yttaddnow'}" data-i="${i}">
-        <span class="ytt-th"><img src="${esc(it.thumb || yttThumb(it.id))}" alt="" loading="lazy"></span>
-        <span class="ytt-tx"><b class="ell">${esc(it.title)}</b><small class="ell">${esc(it.artist || '')}${kind === 'q' && i === q.index ? ' · now playing' : ''}</small></span>
+        <span class="ytt-th ${isAu(it.id) ? 'sq' : ''}">${it.thumb ? `<img src="${esc(it.thumb)}" alt="" loading="lazy" onerror="this.remove()">` : ''}${kind === 'q' && i === q.index && q.playing ? '<i class="ytt-eq"><b></b><b></b><b></b></i>' : ''}</span>
+        <span class="ytt-tx"><b class="ell">${esc(it.title)}</b><small>${yttSrcTag(it)}<span class="ell">${esc(it.artist || '')}${it.secs ? ' · ' + yttFmt(it.secs) : ''}</span></small></span>
       </button>
-      ${kind === 'q' ? `<button class="press ytt-mini" data-act="yttremove" data-i="${i}" aria-label="Remove">${I.x}</button>`
-        : `<button class="press ytt-mini" data-act="yttaddnext" data-i="${i}" aria-label="Play next" title="Play next">${svg(18, '<path d="M4 7h11M4 12h11M4 17h7"/><path d="M18 14v6M15 17h6"/>', 'fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"')}</button>
-           <button class="press ytt-mini" data-act="yttaddend" data-i="${i}" aria-label="Add to queue" title="Add to queue">${svg(18, '<path d="M12 5v14M5 12h14"/>', 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"')}</button>`}
+      ${kind === 'q' ? `<button class="press ytt-mini" data-act="yttremove" data-i="${i}" aria-label="Remove from queue">${I.x}</button>`
+        : `<button class="press ytt-mini" data-act="yttaddnext" data-i="${i}" aria-label="Play next">${svg(18, '<path d="M4 7h11M4 12h11M4 17h7"/><path d="M18 14v6M15 17h6"/>', 'fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"')}</button>
+           <button class="press ytt-mini" data-act="yttaddend" data-i="${i}" aria-label="Add to queue">${svg(18, '<path d="M12 5v14M5 12h14"/>', 'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"')}</button>`}
     </div>`;
+  const au = YTS.results.map((it, i) => [it, i]).filter(([it]) => isAu(it.id)), yt = YTS.results.map((it, i) => [it, i]).filter(([it]) => !isAu(it.id));
+  const stage = !cur ? `<div class="ytt-empty"><span class="ytt-empty-ico">${YTT_NOTE}</span><b>Nothing playing yet</b><span>Search a song below. ${esc(P.name)} hears it at the same moment.</span></div>`
+    : isAu(cur.id) ? `<div class="ytt-art"><div class="ytt-art-bg" style="background-image:url('${esc(cur.thumb || '')}')"></div><div class="ytt-art-img">${cur.thumb ? `<img src="${esc(cur.thumb)}" alt="">` : YTT_NOTE}</div></div>` : '';
   return `<div class="overlay ytt ${OPENED.ytt ? 'sheetUp' : ''}">
     <div class="ytt-top">
       <button class="icon-btn press" data-act="yttclose" aria-label="Minimise">${I.chevD}</button>
-      <div class="ytt-status ${here ? 'live' : ''}"><span class="dot"></span>${here ? esc(P.name) + ' is here' : esc(P.name) + ' isn’t here yet'}</div>
-      <span class="ytt-beta big">test</span>
+      <div class="ytt-head"><div class="ytt-title">listen online</div><div class="ytt-status ${here ? 'live' : ''}"><span class="dot"></span>${here ? esc(P.name) + ' is here' : esc(P.name) + ' isn’t here yet'}</div></div>
+      <span></span>
     </div>
-    <div class="ytt-stage">
-      <div id="yttSlot" class="ytt-slot">${cur ? '' : `<div class="ytt-empty">${YTT_ICON}<span>Search or paste a YouTube link to start</span></div>`}</div>
-    </div>
+    <div class="ytt-stage"><div id="yttSlot" class="ytt-slot">${stage}</div></div>
     <div class="ytt-now">
-      <div class="ytt-t ell">${cur ? esc(cur.title) : 'Nothing playing'}</div>
-      <div class="ytt-a ell">${cur ? esc(cur.artist || 'YouTube') : 'Both of you control the same player'}</div>
+      <div class="ytt-t ell">${cur ? esc(cur.title) : 'Pick a song to start'}</div>
+      <div class="ytt-a">${cur ? yttSrcTag(cur) + `<span class="ell">${esc(cur.artist || '')}</span>` : 'You both control the same player'}</div>
       <input id="yttSeek" type="range" min="0" max="1" value="0" step="1" ${cur ? '' : 'disabled'} aria-label="Seek">
       <div class="ytt-times"><span data-ytt-t>0:00</span><span data-ytt-d>–:––</span></div>
       <div class="ytt-ctl">
@@ -4894,21 +5006,24 @@ function yttView() {
     </div>
     <div class="ytt-scroll">
       <div class="ytt-search">${I.search(18)}
-        <input id="yttQ" type="search" placeholder="Search YouTube or paste a link" value="${esc(S.yttQ || '')}" autocomplete="off" enterkeyhint="search">
-        <button class="press" data-act="yttsearch" aria-label="Search">${YTS.searching ? '<span class="dlg-spin" style="border-color:rgba(0,0,0,.15);border-top-color:var(--accent)"></span>' : 'Go'}</button>
+        <input id="yttQ" type="search" placeholder="Search songs or paste a YouTube link" value="${esc(S.yttQ || '')}" autocomplete="off" enterkeyhint="search">
+        <button class="press" data-act="yttsearch" aria-label="Search">${YTS.searching ? '<span class="dlg-spin"></span>' : 'Search'}</button>
       </div>
+      ${!YTS.results.length && !YTS.searching ? `<div class="ytt-ideas">${YTT_IDEAS.map(t => `<button class="press" data-act="yttidea" data-q="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : ''}
       ${YTS.searchMsg ? `<p class="ytt-msg">${esc(YTS.searchMsg)}</p>` : ''}
-      ${YTS.results.length ? `<div class="ytt-h">Results <button class="press" data-act="yttclearres">Clear</button></div>${YTS.results.map((it, i) => row(it, i, 'r')).join('')}` : ''}
-      <div class="ytt-h">Queue <span>${q.queue.length}</span></div>
+      ${YTS.results.length ? `<div class="ytt-h">Results <button class="press" data-act="yttclearres">Clear</button></div>` : ''}
+      ${au.length ? `<div class="ytt-sub">full songs · free</div>${au.map(([it, i]) => row(it, i, 'r')).join('')}` : ''}
+      ${yt.length ? `<div class="ytt-sub">youtube</div>${yt.map(([it, i]) => row(it, i, 'r')).join('')}` : ''}
+      <div class="ytt-h">Up next <span>${q.queue.length ? q.queue.length + (q.queue.length === 1 ? ' song' : ' songs') : ''}</span></div>
       ${q.queue.length ? q.queue.map((it, i) => row(it, i, 'q')).join('') : `<p class="ytt-msg">Songs you add show up here for both of you.</p>`}
+      <p class="ytt-credit">Free songs from Audius · videos from YouTube</p>
     </div>
   </div>`;
 }
-
 /* ---------- app updates: notice a new version on the server and offer a one-tap update ----------
    No version numbers to remember: we compare the app file on the server with the one that's running. */
 const UPD = { base: null, busy: false, seen: null };
-var BUILD = '2026-11-10T18:07:05+05:30';   // stamped every time a new version is made
+var BUILD = '2026-11-10T21:38:53+05:30';   // stamped every time a new version is made
 function buildLabel() { return (() => { const d = new Date(BUILD); return isNaN(d) ? '' : d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' }); })(); }
 async function appFingerprint() {
   const r = await fetch(location.pathname + '?u=' + Date.now(), { cache: 'no-store' });
